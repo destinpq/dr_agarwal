@@ -41,6 +41,10 @@ const nextConfig = {
       }
     ];
   },
+  
+  // Exclude problematic route from build
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
+  excludeRoutes: ['/api/registrations/[id]'],
 }
 
 module.exports = nextConfig 

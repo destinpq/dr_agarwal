@@ -11,7 +11,8 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main.js",
-    "lint": "eslint \"{src,apps,libs}/**/*.ts\""
+    "lint": "eslint \"{src,apps,libs}/**/*.ts\"",
+    "health-check": "curl -v http://localhost:8080 || curl -v http://localhost:8080/health"
   },
   "engines": {
     "node": "20.x"

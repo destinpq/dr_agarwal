@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 // API endpoint for updating a registration by ID
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const formData = await request.formData();
-    const id = context.params.id;
+    const id = params.id;
     
     if (!id) {
       return NextResponse.json(

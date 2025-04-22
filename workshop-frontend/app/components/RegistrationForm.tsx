@@ -149,10 +149,26 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       let response;
       let responseData;
       
+      // Log browser environment variables
+      console.log('Environment check:', {
+        NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL || 'not set',
+        window_location: window.location.href,
+        hostname: window.location.hostname
+      });
+
+      // Determine if we're running on goldfish-app
+      const isGoldfishApp = window.location.hostname.includes('goldfish-app');
+      // Force use of plankton for goldfish app
+      const apiEndpoint = isGoldfishApp 
+        ? 'https://plankton-app-jrxs6.ondigitalocean.app/api/registrations'
+        : '/api/registrations';
+        
+      console.log('Using API endpoint:', apiEndpoint);
+      
       if (!showPaymentUpload) {
         // First step - create registration
         console.log('Submitting registration - Step 1: Initial registration');
-        response = await fetch('/api/registrations', {
+        response = await fetch(apiEndpoint, {
           method: 'POST',
           body: formData,
         });
@@ -176,7 +192,13 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        response = await fetch(`/api/registrations?id=${registrationId}`, {
+        const updateEndpoint = isGoldfishApp 
+          ? `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${registrationId}`
+          : `/api/registrations?id=${registrationId}`;
+          
+        console.log('Using update endpoint:', updateEndpoint);
+        
+        response = await fetch(updateEndpoint, {
           method: 'PATCH',
           body: formData,
         });

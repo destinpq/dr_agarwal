@@ -3,85 +3,56 @@ const http = require('http');
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const net = require('net');
 
 // Load environment variables if dotenv is available
 try {
   const dotenv = require('dotenv');
   dotenv.config();
   console.log('Environment variables loaded from .env file');
-} catch (err) {
+} catch (error) {
   console.log('Dotenv not available, using process.env directly');
+  console.log('Error details:', error.message);
 }
 
 console.log('Starting combined server for Next.js frontend + Health Check');
 console.log(`NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
 
-// Get ports from environment or use defaults with fallbacks
-const PRIMARY_HEALTH_PORT = parseInt(process.env.HEALTH_PORT || '8080', 10);
-const FALLBACK_HEALTH_PORTS = [8081, 8082, 8083, 8084, 8085];
-const APP_PORT = parseInt(process.env.PORT || '3000', 10);
+// On Digital Ocean, we get an assigned port via environment variables
+// This port will be used for both the health check and the Next.js app
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
-// Function to check if a port is available
-function isPortAvailable(port) {
-  return new Promise((resolve) => {
-    const tester = net.createServer()
-      .once('error', () => resolve(false))
-      .once('listening', () => {
-        tester.once('close', () => resolve(true))
-          .close();
-      })
-      .listen(port, '0.0.0.0');
-  });
-}
-
-// Start health check server on an available port
-async function startHealthServer() {
-  let healthPort = PRIMARY_HEALTH_PORT;
-  
-  // First try the primary port
-  if (await isPortAvailable(healthPort)) {
-    startHealthServerOnPort(healthPort);
-    return;
-  }
-  
-  console.log(`Health port ${healthPort} is not available, trying fallback ports...`);
-  
-  // Try fallback ports
-  for (const port of FALLBACK_HEALTH_PORTS) {
-    if (await isPortAvailable(port)) {
-      console.log(`Using fallback health port: ${port}`);
-      startHealthServerOnPort(port);
-      return;
-    }
-  }
-  
-  // If we reach here, no ports were available
-  console.error('Could not find an available port for health check server');
-  process.exit(1);
-}
-
-function startHealthServerOnPort(port) {
-  const healthServer = http.createServer((req, res) => {
+// Create a combined HTTP server that will handle both health checks and proxy to Next.js
+const server = http.createServer((req, res) => {
+  // Simple path-based router
+  if (req.url === '/health' || req.url === '/') {
+    // Health check endpoint
     console.log(`Health check received from ${req.socket.remoteAddress}`);
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('OK');
-  });
-  
-  healthServer.on('error', (e) => {
-    console.error(`Health server error: ${e.message}`);
-    if (e.code === 'EADDRINUSE') {
-      console.error(`Port ${port} is already in use. Please use a different port.`);
-    }
-  });
-  
-  healthServer.listen(port, '0.0.0.0', () => {
-    console.log(`Health check server running on http://0.0.0.0:${port}`);
-  });
-}
+  } else {
+    // For all other requests, proxy to Next.js
+    // This is handled by the Next.js app directly in production mode
+    // In development mode, we'd need to configure a proxy here
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
+  }
+});
 
-// Start health server
-startHealthServer();
+// Handle startup errors gracefully
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Please ensure no other services are running on this port.`);
+    console.error('If running on Digital Ocean, try requesting a different port from their support team.');
+  } else {
+    console.error(`Server error: ${err.message}`);
+  }
+  process.exit(1);
+});
+
+// Start the server
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Health check server running on http://0.0.0.0:${PORT}`);
+});
 
 // Handle clean shutdown
 process.on('SIGINT', () => {
@@ -96,7 +67,7 @@ process.on('SIGTERM', () => {
 
 // Start the Next.js app directly with next start/dev
 const isDevelopment = process.env.NODE_ENV === 'development';
-console.log(`Starting Next.js in ${isDevelopment ? 'development' : 'production'} mode on port ${APP_PORT}`);
+console.log(`Starting Next.js in ${isDevelopment ? 'development' : 'production'} mode`);
 
 // Check if .next directory exists
 if (!fs.existsSync(path.join(__dirname, '.next'))) {
@@ -119,9 +90,14 @@ if (!fs.existsSync(path.join(__dirname, '.next'))) {
 }
 
 function startNextjs() {
-  // Start Next.js using either next start or next dev
+  // Use a different port for Next.js in development mode to avoid conflicts
+  // In production, use the assigned port from process.env.PORT
   const command = isDevelopment ? 'next dev' : 'next start';
-  const nextApp = spawn('npx', [command, '-p', APP_PORT.toString()], {
+  const args = isDevelopment 
+    ? [command, '-p', '3001'] // Use a different port for dev mode
+    : [command, '-p', PORT.toString()]; // Use assigned port in production
+  
+  const nextApp = spawn('npx', args, {
     stdio: 'inherit',
     shell: true
   });

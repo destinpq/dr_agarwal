@@ -158,20 +158,56 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
 
       // Determine if we're running on goldfish-app
       const isGoldfishApp = window.location.hostname.includes('goldfish-app');
-      // Force use of plankton for goldfish app
-      const apiEndpoint = isGoldfishApp 
-        ? 'https://plankton-app-jrxs6.ondigitalocean.app/api/registrations'
-        : '/api/registrations';
+      // Try both with and without the /api prefix
+      let apiEndpoint = '/api/registrations';
+      
+      if (isGoldfishApp) {
+        // First, try direct with /api prefix
+        const withApiPrefix = 'https://plankton-app-jrxs6.ondigitalocean.app/api/registrations';
+        // Also try without the /api prefix as a fallback
+        const withoutApiPrefix = 'https://plankton-app-jrxs6.ondigitalocean.app/registrations';
         
-      console.log('Using API endpoint:', apiEndpoint);
+        // Use the one with /api prefix first
+        apiEndpoint = withApiPrefix;
+        console.log('Using initial API endpoint:', apiEndpoint);
+        console.log('Will fallback to:', withoutApiPrefix, 'if first attempt fails');
+      }
       
       if (!showPaymentUpload) {
         // First step - create registration
         console.log('Submitting registration - Step 1: Initial registration');
-        response = await fetch(apiEndpoint, {
-          method: 'POST',
-          body: formData,
-        });
+        
+        try {
+          response = await fetch(apiEndpoint, {
+            method: 'POST',
+            body: formData,
+            headers: isGoldfishApp ? {
+              'Origin': 'https://goldfish-app-sibhj.ondigitalocean.app'
+            } : undefined,
+            credentials: isGoldfishApp ? 'omit' : 'same-origin',
+            mode: isGoldfishApp ? 'cors' : 'same-origin'
+          });
+          
+          // If using API endpoint failed and we're on goldfish, try without the /api prefix
+          if (!response.ok && isGoldfishApp && apiEndpoint.includes('/api/')) {
+            console.log('First attempt failed, trying without /api prefix');
+            apiEndpoint = 'https://plankton-app-jrxs6.ondigitalocean.app/registrations';
+            
+            // Try again with the alternative endpoint
+            response = await fetch(apiEndpoint, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'Origin': 'https://goldfish-app-sibhj.ondigitalocean.app'
+              },
+              credentials: 'omit',
+              mode: 'cors'
+            });
+          }
+        } catch (fetchError) {
+          console.error('Fetch error:', fetchError);
+          throw new Error('Network error: ' + ((fetchError as Error)?.message || 'Failed to connect to server'));
+        }
       } else {
         // Update with payment
         const registrationId = localStorage.getItem('registrationId');
@@ -192,16 +228,43 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        const updateEndpoint = isGoldfishApp 
+        let updateEndpoint = isGoldfishApp 
           ? `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${registrationId}`
           : `/api/registrations?id=${registrationId}`;
           
         console.log('Using update endpoint:', updateEndpoint);
         
-        response = await fetch(updateEndpoint, {
-          method: 'PATCH',
-          body: formData,
-        });
+        try {
+          response = await fetch(updateEndpoint, {
+            method: 'PATCH',
+            body: formData,
+            headers: isGoldfishApp ? {
+              'Origin': 'https://goldfish-app-sibhj.ondigitalocean.app'
+            } : undefined,
+            credentials: isGoldfishApp ? 'omit' : 'same-origin',
+            mode: isGoldfishApp ? 'cors' : 'same-origin'
+          });
+          
+          // If using API endpoint failed and we're on goldfish, try without the /api prefix
+          if (!response.ok && isGoldfishApp && updateEndpoint.includes('/api/')) {
+            console.log('First attempt failed, trying without /api prefix for update');
+            updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/registrations/${registrationId}`;
+            
+            // Try again with the alternative endpoint
+            response = await fetch(updateEndpoint, {
+              method: 'PATCH',
+              body: formData,
+              headers: {
+                'Origin': 'https://goldfish-app-sibhj.ondigitalocean.app'
+              },
+              credentials: 'omit',
+              mode: 'cors'
+            });
+          }
+        } catch (fetchError) {
+          console.error('Fetch error:', fetchError);
+          throw new Error('Network error: ' + ((fetchError as Error)?.message || 'Failed to connect to server'));
+        }
       }
       
       console.log('API response status:', response.status);
@@ -214,13 +277,21 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         let errorMessage = 'Failed to process registration';
         
         try {
+          // Get detailed error information
+          console.log('Detailed error response:');
+          console.log('- Status:', response.status);
+          console.log('- Status Text:', response.statusText);
+          console.log('- URL:', response.url);
+          console.log('- Headers:', Object.fromEntries(response.headers.entries()));
+          
           if (contentType && contentType.includes('application/json')) {
             const errorData = await response.json();
-            errorMessage = errorData.error || errorMessage;
+            console.log('- Error JSON data:', errorData);
+            errorMessage = errorData.error || errorData.message || errorMessage;
           } else {
             // Try to get response text if not JSON
             const errorText = await response.text();
-            console.log('Error response text:', errorText);
+            console.log('- Error Text:', errorText);
           }
         } catch (parseError) {
           console.error('Error parsing error response:', parseError);

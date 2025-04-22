@@ -163,7 +163,7 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       
       if (isGoldfishApp) {
         // First, try direct with /api prefix
-        const withApiPrefix = 'https://plankton-app-jrxs6.ondigitalocean.app/api/registrations';
+        const withApiPrefix = 'https://plankton-app-jrxs6.ondigitalocean.app/registrations';
         // Also try without the /api prefix as a fallback
         const withoutApiPrefix = 'https://plankton-app-jrxs6.ondigitalocean.app/registrations';
         
@@ -229,8 +229,8 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
         let updateEndpoint = isGoldfishApp 
-          ? `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${registrationId}`
-          : `/api/registrations?id=${registrationId}`;
+          ? `https://plankton-app-jrxs6.ondigitalocean.app/registrations/${registrationId}`
+          : `/registrations?id=${registrationId}`;
           
         console.log('Using update endpoint:', updateEndpoint);
         

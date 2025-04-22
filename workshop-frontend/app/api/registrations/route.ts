@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
+// Removed unused imports
+// import { validateRegistrationData } from '@/utils/validation';
+// import { sendConfirmationEmail, sendAdminNotificationEmail } from '@/utils/email';
+// import { RegistrationData } from '@/types/registration';
 
-// API endpoint for registrations
+// Hardcoded backend URL
+const backendUrl = 'https://plankton-app-jrxs6.ondigitalocean.app/api';
+
+/**
+ * Handles POST requests to create a new registration.
+ * Validates the incoming data, sends it to the backend, and handles email notifications.
+ */
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     
     // NOTE: Using environment variable with fallback to handle both local and production
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
     if (!backendUrl) {
       return NextResponse.json(
         { error: 'Backend URL not configured. Please set BACKEND_URL in environment variables.' },
@@ -78,8 +87,6 @@ export async function PATCH(request: NextRequest) {
     }
     
     // Get backend URL from environment variables
-    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL;
-    
     if (!backendUrl) {
       return NextResponse.json(
         { error: 'Backend URL not configured. Please set BACKEND_URL in environment variables.' },

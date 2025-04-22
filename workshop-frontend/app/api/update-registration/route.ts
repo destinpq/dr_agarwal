@@ -1,7 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+// import { sendEmail } from '@/utils/email'; // Ensure this path is correct -> Removed unused import
+
+// Hardcoded backend URL
+const backendUrl = 'https://plankton-app-jrxs6.ondigitalocean.app/api';
 
 // Alternative API endpoint for updating a registration by ID (handles all updates)
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const id = formData.get('id') as string;
@@ -21,9 +25,6 @@ export async function POST(request: Request) {
     }
     
     console.log(`Processing update for registration ID: ${id}`);
-    
-    // Get environment variables or fallback to local development
-    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL;
     
     // Check if backend URL is configured
     if (!backendUrl) {

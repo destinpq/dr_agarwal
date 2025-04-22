@@ -3,11 +3,10 @@
 
 import { NextResponse } from 'next/server';
 
-// Get environment variables or fallback to local development
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+// Hardcoded backend URL
+const backendUrl = 'https://plankton-app-jrxs6.ondigitalocean.app/api';
 
 // API endpoint for updating a registration by ID
-// @ts-expect-error - Attempting to suppress persistent build error on the next line
 export async function PATCH(
   request: Request,
   context: { params: { id: string } }

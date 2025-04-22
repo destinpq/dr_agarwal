@@ -168,15 +168,10 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         hostname: window.location.hostname
       });
 
-      // Use a local development URL with /api prefix as default
-      let apiEndpoint = '/api/registrations';
+      // Hardcoded API endpoint
+      const apiEndpoint = 'https://plankton-app-jrxs6.ondigitalocean.app/api/registrations';
       
-      // Always get the endpoint from the environment variables if available
-      const envBackendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-      if (envBackendUrl) {
-        apiEndpoint = `${envBackendUrl}/registrations`;
-        console.log('Using API endpoint from env:', apiEndpoint);
-      }
+      console.log('Using API endpoint:', apiEndpoint);
       
       if (!showPaymentUpload) {
         // First step - create registration

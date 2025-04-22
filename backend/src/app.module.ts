@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { ContentModule } from './content/content.module';
 import { AuthModule } from './auth/auth.module';
 import { HealthController } from './health.controller';
 import { RegistrationModule } from './registration/registration.module';
 import { WhatsAppModule } from './whatsapp/whatsapp.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -20,38 +19,12 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module';
     // Database - conditionally loaded
     ...getDatabaseModule(),
     
-    // Email module
-    MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        transport: {
-          host: configService.get('EMAIL_HOST', 'smtp.gmail.com'),
-          port: configService.get('EMAIL_PORT', 465),
-          secure: true,
-          auth: {
-            user: configService.get('EMAIL_USER'),
-            pass: configService.get('EMAIL_PASSWORD'),
-          },
-        },
-        defaults: {
-          from: configService.get('EMAIL_FROM', '"Dr. Agarwal Workshop" <noreply@dragarwal.com>'),
-        },
-        template: {
-          dir: join(__dirname, 'templates'),
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
-          },
-        },
-      }),
-    }),
-    
     // Feature modules
     AuthModule,
     ContentModule,
     RegistrationModule,
     WhatsAppModule,
+    EmailModule,
   ],
   controllers: [HealthController],
   providers: [],

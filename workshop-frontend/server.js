@@ -17,42 +17,9 @@ try {
 console.log('Starting combined server for Next.js frontend + Health Check');
 console.log(`NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
 
-// On Digital Ocean, we get an assigned port via environment variables
-// This port will be used for both the health check and the Next.js app
-const PORT = parseInt(process.env.PORT || '3000', 10);
-
-// Create a combined HTTP server that will handle both health checks and proxy to Next.js
-const server = http.createServer((req, res) => {
-  // Simple path-based router
-  if (req.url === '/health' || req.url === '/') {
-    // Health check endpoint
-    console.log(`Health check received from ${req.socket.remoteAddress}`);
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('OK');
-  } else {
-    // For all other requests, proxy to Next.js
-    // This is handled by the Next.js app directly in production mode
-    // In development mode, we'd need to configure a proxy here
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
-  }
-});
-
-// Handle startup errors gracefully
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use. Please ensure no other services are running on this port.`);
-    console.error('If running on Digital Ocean, try requesting a different port from their support team.');
-  } else {
-    console.error(`Server error: ${err.message}`);
-  }
-  process.exit(1);
-});
-
-// Start the server
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Health check server running on http://0.0.0.0:${PORT}`);
-});
+// Digital Ocean assigns this port dynamically
+const PORT = process.env.PORT || 8080;
+console.log(`Using port: ${PORT}`);
 
 // Handle clean shutdown
 process.on('SIGINT', () => {
@@ -65,11 +32,7 @@ process.on('SIGTERM', () => {
   process.exit(0);
 });
 
-// Start the Next.js app directly with next start/dev
-const isDevelopment = process.env.NODE_ENV === 'development';
-console.log(`Starting Next.js in ${isDevelopment ? 'development' : 'production'} mode`);
-
-// Check if .next directory exists
+// Check if Next.js is already built
 if (!fs.existsSync(path.join(__dirname, '.next'))) {
   console.log('No .next directory found, running next build first...');
   const buildProcess = spawn('npx', ['next', 'build'], {
@@ -90,14 +53,12 @@ if (!fs.existsSync(path.join(__dirname, '.next'))) {
 }
 
 function startNextjs() {
-  // Use a different port for Next.js in development mode to avoid conflicts
-  // In production, use the assigned port from process.env.PORT
-  const command = isDevelopment ? 'next dev' : 'next start';
-  const args = isDevelopment 
-    ? [command, '-p', '3001'] // Use a different port for dev mode
-    : [command, '-p', PORT.toString()]; // Use assigned port in production
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  console.log(`Starting Next.js in ${isDevelopment ? 'development' : 'production'} mode`);
   
-  const nextApp = spawn('npx', args, {
+  // Start Next.js
+  const command = isDevelopment ? 'next dev' : 'next start';
+  const nextApp = spawn('npx', [command, '-p', PORT.toString()], {
     stdio: 'inherit',
     shell: true
   });
@@ -112,4 +73,32 @@ function startNextjs() {
       process.exit(code);
     }
   });
+  
+  // Create a health check server on port 8000 - a common port that's usually available
+  // This is separate from the Next.js app port
+  const HEALTH_PORT = process.env.HEALTH_PORT || 8000;
+  
+  const healthServer = http.createServer((req, res) => {
+    console.log(`Health check received from ${req.socket.remoteAddress}`);
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('OK');
+  });
+  
+  healthServer.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Health check port ${HEALTH_PORT} is already in use, but will continue Next.js startup.`);
+      // Just log the error, don't exit - we prioritize the Next.js app
+    } else {
+      console.error(`Health server error: ${err.message}`);
+    }
+  });
+  
+  try {
+    healthServer.listen(HEALTH_PORT, '0.0.0.0', () => {
+      console.log(`Health check server running on http://0.0.0.0:${HEALTH_PORT}`);
+    });
+  } catch (err) {
+    console.error(`Failed to start health check server: ${err.message}`);
+    console.log('Continuing with Next.js startup only');
+  }
 } 

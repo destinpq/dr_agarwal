@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
 
 // API endpoint for updating a registration by ID
-// @ts-ignore - Attempting to suppress persistent build error on the next line
+// @ts-expect-error - Attempting to suppress persistent build error on the next line
 export async function PATCH(
   request: Request,
   context: { params: { id: string } }

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // API endpoint for registrations
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const formData = await req.formData();
+    const formData = await request.formData();
     
     // NOTE: Using environment variable with fallback to handle both local and production
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
@@ -58,10 +58,10 @@ export async function POST(req: NextRequest) {
 }
 
 // Endpoint to update registration with payment screenshot
-export async function PATCH(req: NextRequest) {
+export async function PATCH(request: NextRequest) {
   try {
-    const formData = await req.formData();
-    const id = req.nextUrl.searchParams.get('id') || formData.get('id') as string;
+    const formData = await request.formData();
+    const id = request.nextUrl.searchParams.get('id') || formData.get('id') as string;
     
     if (!id) {
       return NextResponse.json(

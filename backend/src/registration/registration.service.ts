@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MailerService } from '@nestjs-modules/mailer';
+import { EmailService } from '../email/email.service';
 import { Registration } from './registration.entity';
 import { CreateRegistrationDto, PaymentStatus, UpdateRegistrationDto } from './dto/create-registration.dto';
 import { ConfigService } from '@nestjs/config';
@@ -14,7 +14,7 @@ export class RegistrationService {
   constructor(
     @InjectRepository(Registration)
     private registrationRepository: Repository<Registration>,
-    private readonly mailerService: MailerService,
+    private readonly emailService: EmailService,
     private readonly configService: ConfigService,
     private readonly whatsAppService: WhatsAppService,
   ) {}
@@ -102,18 +102,27 @@ export class RegistrationService {
     
     try {
       // Send email to admin
-      await this.mailerService.sendMail({
-        to: adminEmail,
-        subject: 'New Workshop Registration',
-        template: 'admin-registration',
-        context: {
-          registration: {
-            ...registration,
-            paymentStatus: registration.paymentStatus === PaymentStatus.COMPLETED ? 'Completed' : 'Pending',
-            isCompleted: registration.paymentStatus === PaymentStatus.COMPLETED,
-          },
-        },
-      });
+      await this.emailService.sendMail(
+        adminEmail,
+        'New Workshop Registration',
+        `A new registration has been submitted for Dr. Agarwal's Psychology Workshop.
+      
+        Registration Details:
+        - ID: ${registration.id}
+        - Name: ${registration.name}
+        - Email: ${registration.email}
+        - Phone: ${registration.phone}
+        - Age: ${registration.age}
+        - Interest Area: ${registration.interestArea}
+        - Preferred Dates: ${registration.preferredDates}
+        - Preferred Timing: ${registration.preferredTiming}
+        - Expectations: ${registration.expectations || 'None provided'}
+        - Referral Source: ${registration.referralSource}
+        - Payment Status: ${registration.paymentStatus}
+        - Registration Date: ${registration.createdAt}
+        
+        You can view and manage all registrations in the admin dashboard.`
+      );
       
       this.logger.log(`Admin notification sent to ${adminEmail}`);
     } catch (error) {
@@ -122,20 +131,29 @@ export class RegistrationService {
     
     try {
       // Send email to user
-      await this.mailerService.sendMail({
-        to: userEmail,
-        subject: 'Workshop Registration Confirmation',
-        template: 'user-registration',
-        context: {
-          name: registration.name,
-          paymentStatus: registration.paymentStatus === PaymentStatus.COMPLETED ? 'Completed' : 'Pending',
-          isPending: registration.paymentStatus === PaymentStatus.PENDING,
-          workshopDetails: {
-            dates: registration.preferredDates.join(' - '),
-            timing: registration.preferredTiming,
-          },
-        },
-      });
+      await this.emailService.sendMail(
+        userEmail,
+        'Workshop Registration Confirmation',
+        `Hello ${registration.name},
+      
+        Thank you for registering for Dr. Agarwal's Psychology Workshop. We're excited to have you join us!
+        
+        Workshop Details:
+        - Dates: ${registration.preferredDates.join(' - ')}
+        - Timing: ${registration.preferredTiming}
+        - Payment Status: ${registration.paymentStatus === PaymentStatus.COMPLETED ? 'Completed' : 'Pending'}
+        
+        ${registration.paymentStatus !== PaymentStatus.COMPLETED 
+          ? 'Please complete your payment to secure your spot in the workshop. You can do this by logging back into the workshop registration portal.' 
+          : 'Your payment has been confirmed. You\'re all set for the workshop!'}
+        
+        If you have any questions or need assistance, please don't hesitate to contact us.
+        
+        We look forward to seeing you at the workshop!
+        
+        Best regards,
+        Dr. Agarwal's Workshop Team`
+      );
       
       this.logger.log(`User confirmation sent to ${userEmail}`);
       
@@ -199,17 +217,20 @@ Dr. Agarwal's Psychology Workshop Team`;
     
     try {
       // Send payment confirmation to admin
-      await this.mailerService.sendMail({
-        to: adminEmail,
-        subject: 'Workshop Payment Completed',
-        template: 'admin-payment-confirmation',
-        context: {
-          registration: {
-            ...registration,
-          },
-          backendUrl,
-        },
-      });
+      await this.emailService.sendMail(
+        adminEmail,
+        'Workshop Payment Completed',
+        `Payment has been completed for registration:
+        
+        Registration Details:
+        - ID: ${registration.id}
+        - Name: ${registration.name}
+        - Email: ${registration.email}
+        - Phone: ${registration.phone}
+        - Payment Status: Completed
+        
+        You can view the payment screenshot and registration details in the admin dashboard.`
+      );
       
       this.logger.log(`Admin payment notification sent to ${adminEmail}`);
     } catch (error) {
@@ -223,19 +244,26 @@ Dr. Agarwal's Psychology Workshop Team`;
     
     try {
       // Send payment confirmation to user
-      await this.mailerService.sendMail({
-        to: userEmail,
-        subject: 'Workshop Payment Confirmation',
-        template: 'user-payment-confirmation',
-        context: {
-          name: registration.name,
-          workshopDetails: {
-            dates: registration.preferredDates.join(' - '),
-            timing: registration.preferredTiming,
-          },
-          paymentScreenshotUrl,
-        },
-      });
+      await this.emailService.sendMail(
+        userEmail,
+        'Workshop Payment Confirmation',
+        `Hello ${registration.name},
+        
+        We're pleased to confirm that your payment for the Psychology Workshop has been successfully processed. Your spot is now fully secured!
+        
+        Workshop Details:
+        - Dates: ${registration.preferredDates.join(' - ')}
+        - Timing: ${registration.preferredTiming}
+        
+        We will send you a reminder email with the workshop materials and joining instructions a few days before the event.
+        
+        If you have any questions or need to make changes to your registration, please contact us as soon as possible.
+        
+        We look forward to seeing you at the workshop!
+        
+        Warm regards,
+        Dr. Agarwal's Workshop Team`
+      );
       
       this.logger.log(`User payment confirmation sent to ${userEmail}`);
       

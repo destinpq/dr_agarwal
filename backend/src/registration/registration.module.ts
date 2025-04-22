@@ -5,6 +5,7 @@ import { Registration } from './registration.entity';
 import { RegistrationController } from './registration.controller';
 import { RegistrationService } from './registration.service';
 import { WhatsAppModule } from '../whatsapp/whatsapp.module';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { WhatsAppModule } from '../whatsapp/whatsapp.module';
       dest: './uploads',
     }),
     WhatsAppModule,
+    EmailModule,
   ],
   controllers: [RegistrationController],
   providers: [RegistrationService],

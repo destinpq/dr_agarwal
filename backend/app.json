@@ -1,0 +1,18 @@
+{
+  "name": "dr-agarwal-backend",
+  "description": "Backend API for Dr. Agarwal website",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "NPM_CONFIG_PRODUCTION": {
+      "description": "Set to false to install devDependencies",
+      "value": "false"
+    }
+  },
+  "scripts": {
+    "build": "./build-do.sh"
+  }
+} 

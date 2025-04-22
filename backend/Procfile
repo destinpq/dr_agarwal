@@ -1,1 +1,1 @@
-web: PORT=8080 npm install -g typescript && tsc -p tsconfig.json && HEALTH_CHECK_PATH=/ PORT=8080 node dist/main.js 
+web: PORT=8080 npm install -g typescript && tsc -p tsconfig.json && PORT=8080 NODE_ENV=production HOST=0.0.0.0 node dist/main.js 

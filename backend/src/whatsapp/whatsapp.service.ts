@@ -1,6 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client, LocalAuth, MessageMedia } from 'whatsapp-web.js';
+// Import qrcode-terminal for proper QR code display in console
+import * as qrcodeTerminal from 'qrcode-terminal';
 
 @Injectable()
 export class WhatsAppService implements OnModuleInit {
@@ -52,16 +54,12 @@ export class WhatsAppService implements OnModuleInit {
   private setupEventListeners() {
     // Handle QR code generation (only needed on first run)
     this.client.on('qr', (qr) => {
-      // Log the QR code in a format that can be displayed in terminal
       this.logger.log('WhatsApp QR Code received. Scan with your phone:');
       
-      // Create a simple ASCII QR code representation
-      const qrLines = this.generateAsciiQR(qr);
+      // Generate and display QR code in console
+      qrcodeTerminal.generate(qr, { small: false });
       
-      // Log each line of the QR code
-      qrLines.forEach(line => console.log(line));
-      
-      this.logger.log('If QR code is not visible, use this string to generate it:');
+      this.logger.log('If QR code is not visible, use this string with an online QR generator:');
       this.logger.log(qr);
     });
 
@@ -82,34 +80,6 @@ export class WhatsAppService implements OnModuleInit {
       this.isReady = false;
       this.logger.warn('WhatsApp client disconnected');
     });
-  }
-
-  /**
-   * Generate a simple ASCII QR code for console display
-   * This is a very basic implementation - in production you might want to use qrcode-terminal
-   */
-  private generateAsciiQR(qr: string): string[] {
-    // Log the QR string directly
-    this.logger.log('Scan this QR code with WhatsApp on your phone:');
-    this.logger.log('---------------------------------------------');
-    this.logger.log(`QR Code: ${qr}`);
-    this.logger.log('---------------------------------------------');
-    this.logger.log('If you cannot see a QR code above, please install qrcode-terminal package');
-    this.logger.log('or use an online QR code generator with the string above.');
-    
-    return [
-      '████████████████████████████████',
-      '█                              █',
-      '█  Scan this QR code with the  █',
-      '█  WhatsApp mobile app.        █',
-      '█                              █',
-      '█  If you cannot see a QR code █',
-      '█  in this console, copy the   █',
-      '█  string above and use an     █',
-      '█  online QR generator.        █',
-      '█                              █',
-      '████████████████████████████████'
-    ];
   }
 
   /**

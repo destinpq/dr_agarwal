@@ -2,14 +2,13 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Workshop Payment Confirmation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Received - Workshop Registration</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       line-height: 1.6;
       color: #333;
-      margin: 0;
-      padding: 0;
     }
     .container {
       max-width: 600px;
@@ -17,7 +16,7 @@
       padding: 20px;
     }
     .header {
-      background-color: #f0f9ff;
+      background-color: #f0e6ff;
       padding: 20px;
       text-align: center;
       border-radius: 5px 5px 0 0;
@@ -38,52 +37,55 @@
     h1 {
       color: #52c41a;
       margin: 0;
-      padding: 0;
     }
-    h2 {
-      color: #333;
-      margin-top: 20px;
-    }
-    .info-table {
+    table {
       width: 100%;
       border-collapse: collapse;
       margin: 20px 0;
     }
-    .info-table th {
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #f0e6ff;
+      padding: 10px;
       text-align: left;
+    }
+    td {
       padding: 10px;
-      background-color: #f0f9ff;
-      border-bottom: 1px solid #ddd;
     }
-    .info-table td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
+    .highlight {
+      background-color: #f6ffed;
+      border-left: 4px solid #52c41a;
+      padding: 15px;
+      margin: 20px 0;
     }
-    .success-icon {
-      font-size: 48px;
-      color: #52c41a;
-      margin-bottom: 15px;
-    }
-    .screenshot-link {
-      color: #1890ff;
+    .screenshot-button {
+      display: inline-block;
+      background-color: #722ed1;
+      color: white;
+      padding: 10px 20px;
       text-decoration: none;
-    }
-    .screenshot-link:hover {
-      text-decoration: underline;
+      border-radius: 4px;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <div class="success-icon">✓</div>
-      <h1>Workshop Payment Received</h1>
+      <h1>Payment Received</h1>
     </div>
     <div class="content">
-      <p>A participant has completed their payment for the Psychology Workshop.</p>
+      <div class="highlight">
+        <p>A payment has been received for a workshop registration.</p>
+      </div>
       
-      <h2>Participant Details</h2>
-      <table class="info-table">
+      <table>
+        <tr>
+          <th>Registration ID</th>
+          <td>{{registration.id}}</td>
+        </tr>
         <tr>
           <th>Name</th>
           <td>{{registration.name}}</td>
@@ -101,42 +103,21 @@
           <td>Completed</td>
         </tr>
         <tr>
-          <th>Payment Screenshot</th>
-          <td>
-            {{#if registration.paymentScreenshot}}
-              <div>
-                <a href="{{backendUrl}}/registrations/{{registration.id}}/screenshot" class="screenshot-link" target="_blank">View Screenshot</a>
-                <div style="margin-top: 10px; padding: 10px; border: 1px solid #e8e8e8; border-radius: 8px; background-color: #f9f9f9; text-align: center;">
-                  <img src="{{backendUrl}}/registrations/{{registration.id}}/screenshot" alt="Payment Screenshot" style="max-width: 250px; max-height: 200px; border-radius: 5px;" />
-                </div>
-              </div>
-            {{else}}
-              No screenshot available
-            {{/if}}
-          </td>
+          <th>Payment Date</th>
+          <td>{{registration.updatedAt}}</td>
         </tr>
       </table>
       
-      <h2>Workshop Details</h2>
-      <table class="info-table">
-        <tr>
-          <th>Dates</th>
-          <td>{{registration.preferredDates}}</td>
-        </tr>
-        <tr>
-          <th>Timing</th>
-          <td>{{registration.preferredTiming}}</td>
-        </tr>
-        <tr>
-          <th>Interest Area</th>
-          <td>{{registration.interestArea}}</td>
-        </tr>
-      </table>
+      <p>The payment screenshot can be viewed at the link below:</p>
       
-      <p>You can view all registrations in the admin dashboard.</p>
+      <p>
+        <a href="{{backendUrl}}/registrations/{{registration.id}}/screenshot" class="screenshot-button">View Payment Screenshot</a>
+      </p>
+      
+      <p>You can view and manage all registrations in the admin dashboard.</p>
     </div>
     <div class="footer">
-      <p>This is an automated email from the workshop registration system.</p>
+      <p>This is an automated notification from Dr. Agarwal's Workshop Registration System.</p>
     </div>
   </div>
 </body>

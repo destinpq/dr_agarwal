@@ -2,14 +2,13 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Workshop Registration Confirmation</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       line-height: 1.6;
       color: #333;
-      margin: 0;
-      padding: 0;
     }
     .container {
       max-width: 600px;
@@ -17,59 +16,34 @@
       padding: 20px;
     }
     .header {
-      background-color: #f0e6ff;
-      padding: 20px;
       text-align: center;
-      border-radius: 5px 5px 0 0;
+      margin-bottom: 20px;
     }
     .content {
-      background-color: #fff;
+      background-color: #f9f9f9;
       padding: 20px;
-      border: 1px solid #ddd;
+      border-radius: 5px;
     }
     .footer {
-      background-color: #f5f5f5;
-      padding: 15px;
       text-align: center;
-      font-size: 12px;
-      color: #666;
-      border-radius: 0 0 5px 5px;
-    }
-    h1 {
-      color: #722ed1;
-      margin: 0;
-      padding: 0;
-    }
-    h2 {
-      color: #333;
       margin-top: 20px;
+      font-size: 12px;
+      color: #777;
     }
     .highlight {
-      color: #722ed1;
-      font-weight: bold;
+      background-color: #e9ecef;
+      padding: 10px;
+      border-left: 4px solid #722ed1;
+      margin-bottom: 15px;
     }
     .button {
       display: inline-block;
-      padding: 10px 20px;
       background-color: #722ed1;
-      color: #fff;
+      color: white;
+      padding: 10px 20px;
       text-decoration: none;
-      border-radius: 5px;
-      margin: 20px 0;
-    }
-    .status {
-      padding: 8px 12px;
       border-radius: 4px;
-      display: inline-block;
-      font-weight: bold;
-    }
-    .status-pending {
-      background-color: #faad14;
-      color: #fff;
-    }
-    .status-completed {
-      background-color: #52c41a;
-      color: #fff;
+      margin-top: 15px;
     }
   </style>
 </head>
@@ -79,33 +53,31 @@
       <h1>Workshop Registration Confirmation</h1>
     </div>
     <div class="content">
-      <p>Dear <span class="highlight">{{name}}</span>,</p>
+      <h2>Hello {{name}},</h2>
+      <p>Thank you for registering for Dr. Agarwal's Psychology Workshop. We're excited to have you join us!</p>
       
-      <p>Thank you for registering for our Psychology Workshop! We're excited to have you join us.</p>
-      
-      <h2>Registration Details</h2>
-      <p>
-        <strong>Payment Status:</strong> 
-        <span class="status {{#if isPending}}status-pending{{else}}status-completed{{/if}}">
-          {{paymentStatus}}
-        </span>
-      </p>
-      
-      <p><strong>Workshop Dates:</strong> {{workshopDetails.dates}}</p>
-      <p><strong>Workshop Timing:</strong> {{workshopDetails.timing}}</p>
+      <div class="highlight">
+        <h3>Workshop Details</h3>
+        <p><strong>Dates:</strong> {{workshopDetails.dates}}</p>
+        <p><strong>Timing:</strong> {{workshopDetails.timing}}</p>
+        <p><strong>Payment Status:</strong> {{paymentStatus}}</p>
+      </div>
       
       {{#if isPending}}
-      <p><strong>Next Steps:</strong> Please complete your payment using the UPI link that was provided during registration. After payment, upload the screenshot to complete your registration.</p>
+      <p>Please complete your payment to secure your spot in the workshop. You can do this by logging back into the workshop registration portal.</p>
       {{else}}
-      <p><strong>Next Steps:</strong> Your registration is complete! We will send you the workshop details closer to the date.</p>
+      <p>Your payment has been confirmed. You're all set for the workshop!</p>
       {{/if}}
       
-      <p>If you have any questions or need assistance, please reply to this email.</p>
+      <p>If you have any questions or need assistance, please don't hesitate to contact us.</p>
       
-      <p>Best regards,<br>Dr. Agarwal's Team</p>
+      <p>We look forward to seeing you at the workshop!</p>
+      
+      <p>Best regards,<br>
+      Dr. Agarwal's Workshop Team</p>
     </div>
     <div class="footer">
-      <p>This is an automated email. Please do not reply directly to this message.</p>
+      <p>&copy; 2025 Dr. Agarwal's Psychology Workshop. All rights reserved.</p>
     </div>
   </div>
 </body>

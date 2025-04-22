@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Get environment variables or fallback to local development
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:8080/api';
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
 
 // Define correct types for the PATCH method
 type RouteParams = {
@@ -16,6 +16,14 @@ export async function PATCH(
   { params }: RouteParams
 ) {
   try {
+    // Check if backend URL is configured
+    if (!backendUrl) {
+      return NextResponse.json(
+        { error: 'Backend URL not configured. Please set BACKEND_URL in environment variables.' },
+        { status: 500 }
+      );
+    }
+    
     const formData = await req.formData();
     const id = params.id;
     

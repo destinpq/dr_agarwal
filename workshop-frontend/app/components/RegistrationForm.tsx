@@ -168,15 +168,14 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         hostname: window.location.hostname
       });
 
-      // Determine if we're running on goldfish-app
-      const isGoldfishApp = window.location.hostname.includes('goldfish-app');
       // Use a local development URL with /api prefix as default
       let apiEndpoint = '/api/registrations';
       
-      if (isGoldfishApp) {
-        // Use localhost URL for local development
-        apiEndpoint = 'http://localhost:8080/api/registrations';
-        console.log('Using API endpoint:', apiEndpoint);
+      // Always get the endpoint from the environment variables if available
+      const envBackendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      if (envBackendUrl) {
+        apiEndpoint = `${envBackendUrl}/registrations`;
+        console.log('Using API endpoint from env:', apiEndpoint);
       }
       
       if (!showPaymentUpload) {

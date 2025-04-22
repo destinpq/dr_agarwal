@@ -23,7 +23,16 @@ export async function POST(request: Request) {
     console.log(`Processing update for registration ID: ${id}`);
     
     // Get environment variables or fallback to local development
-    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/api';
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL;
+    
+    // Check if backend URL is configured
+    if (!backendUrl) {
+      return NextResponse.json(
+        { error: 'Backend URL not configured. Please set BACKEND_URL in environment variables.' },
+        { status: 500 }
+      );
+    }
+    
     console.log(`Updating registration at: ${backendUrl}/api/registrations/${id}`);
     
     // Create a new FormData with ONLY payment-related fields

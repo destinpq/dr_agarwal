@@ -28,11 +28,7 @@ const nextConfig = {
   
   // Add API rewrites for backend communication
   async rewrites() {
-    const BACKEND_URL = process.env.BACKEND_URL;
-    if (!BACKEND_URL) {
-      console.error('BACKEND_URL environment variable is not set!');
-      throw new Error('BACKEND_URL must be configured in environment variables');
-    }
+    const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080/api';
     console.log('Using Backend URL:', BACKEND_URL);
     return [
       {
@@ -46,9 +42,8 @@ const nextConfig = {
     ];
   },
   
-  // Exclude problematic route from build
+  // TypeScript and other type-checking performed in separate process
   pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
-  excludeRoutes: ['/api/registrations/[id]'],
 }
 
 module.exports = nextConfig 

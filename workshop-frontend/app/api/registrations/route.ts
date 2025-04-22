@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     
     // Forward the request to the backend API with correct URL
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://plankton-app-jrxs6.ondigitalocean.app';
+    const backendUrl = 'https://plankton-app-jrxs6.ondigitalocean.app';
     
     console.log('Forwarding registration to:', `${backendUrl}/api/registrations`);
     

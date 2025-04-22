@@ -3,14 +3,13 @@
 import { useState } from 'react';
 import { Typography, Badge, Card, Button } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FireOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, HeartOutlined } from '@ant-design/icons';
+import { FireOutlined, HeartOutlined } from '@ant-design/icons';
 import RegistrationForm from './components/RegistrationForm';
 import SuccessMessage from './components/SuccessMessage';
 import WorkshopBenefits from './components/WorkshopBenefits';
-import Testimonials from './components/Testimonials';
 import Logo from './components/Logo';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 export default function Home() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -161,8 +160,6 @@ export default function Home() {
             </AnimatePresence>
           </Card>
         </motion.div>
-
-        
         
       </div>
     </motion.div>

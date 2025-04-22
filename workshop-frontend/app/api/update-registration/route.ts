@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-// API endpoint for updating a registration by ID
-export async function POST(req: NextRequest) {
+// Alternative API endpoint for updating a registration by ID (handles all updates)
+export async function POST(request: Request) {
   try {
-    const formData = await req.formData();
+    const formData = await request.formData();
     const id = formData.get('id') as string;
     
     if (!id) {

@@ -14,7 +14,7 @@ try {
 }
 
 console.log('Starting combined server for Next.js frontend + Health Check');
-console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
 
 // Start health check server
 const healthServer = http.createServer((req, res) => {
@@ -23,8 +23,10 @@ const healthServer = http.createServer((req, res) => {
   res.end('OK');
 });
 
-// Digital Ocean expects health checks on port 8080
+// Get port from environment or use default
 const HEALTH_PORT = parseInt(process.env.HEALTH_PORT || '8080', 10);
+const APP_PORT = parseInt(process.env.PORT || '3000', 10);
+
 healthServer.listen(HEALTH_PORT, '0.0.0.0', () => {
   console.log(`Health check server running on http://0.0.0.0:${HEALTH_PORT}`);
 });
@@ -40,58 +42,46 @@ process.on('SIGTERM', () => {
   process.exit(0);
 });
 
-// Start the Next.js app
-function startNextApp() {
-  try {
-    console.log('Starting Next.js application...');
-    
-    // Use the correct start command based on build output
-    const standaloneDir = path.join(__dirname, '.next', 'standalone');
-    const hasStandalone = fs.existsSync(standaloneDir);
-    
-    if (hasStandalone) {
-      console.log('Using standalone server.js');
-      
-      // If we're in Digital Ocean, check if we need to patch the standalone server
-      if (fs.existsSync('/workspace')) {
-        console.log('Digital Ocean environment detected, adjusting paths...');
-        
-        // Set the NODE_ENV and PORT for the standalone server
-        process.env.NODE_ENV = 'production';
-        process.env.PORT = '3001';
-        
-        try {
-          // Add a synthetic "chdir" since we're in the Digital Ocean environment
-          const originalCwd = process.cwd();
-          process.chdir = function(directory) {
-            console.log(`Intercepted chdir call to ${directory}, staying in ${originalCwd}`);
-            return originalCwd;
-          };
-        } catch (error) {
-          console.error('Failed to patch chdir:', error);
-        }
-      }
-      
-      // Require the standalone server.js
-      const standaloneServerPath = path.join(standaloneDir, 'server.js');
-      console.log(`Loading standalone server from ${standaloneServerPath}`);
-      require(standaloneServerPath);
+// Start the Next.js app directly with next start/dev
+const isDevelopment = process.env.NODE_ENV === 'development';
+console.log(`Starting Next.js in ${isDevelopment ? 'development' : 'production'} mode on port ${APP_PORT}`);
+
+// Check if .next directory exists
+if (!fs.existsSync(path.join(__dirname, '.next'))) {
+  console.log('No .next directory found, running next build first...');
+  const buildProcess = spawn('npx', ['next', 'build'], {
+    stdio: 'inherit',
+    shell: true
+  });
+  
+  buildProcess.on('close', (code) => {
+    if (code === 0) {
+      startNextjs();
     } else {
-      console.log('Using next start command');
-      // Start Next.js using next start (development mode)
-      const nextApp = spawn('npx', ['next', 'start', '-p', '3001'], {
-        stdio: 'inherit',
-        shell: true
-      });
-      
-      nextApp.on('error', (err) => {
-        console.error('Failed to start Next.js application:', err);
-      });
+      console.error(`Build failed with code ${code}`);
+      process.exit(1);
     }
-  } catch (error) {
-    console.error('Error starting Next.js app:', error);
-  }
+  });
+} else {
+  startNextjs();
 }
 
-// Start the Next.js app
-startNextApp(); 
+function startNextjs() {
+  // Start Next.js using either next start or next dev
+  const command = isDevelopment ? 'next dev' : 'next start';
+  const nextApp = spawn('npx', [command, '-p', APP_PORT.toString()], {
+    stdio: 'inherit',
+    shell: true
+  });
+  
+  nextApp.on('error', (err) => {
+    console.error('Failed to start Next.js application:', err);
+  });
+  
+  nextApp.on('close', (code) => {
+    if (code !== 0 && code !== null) {
+      console.error(`Next.js process exited with code ${code}`);
+      process.exit(code);
+    }
+  });
+} 

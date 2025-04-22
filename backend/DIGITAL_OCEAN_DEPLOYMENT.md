@@ -64,6 +64,8 @@ The application uses the following environment variables:
 - `WHATSAPP_SESSION_PATH`: Path to store WhatsApp sessions (default: './whatsapp-sessions')
 - `WHATSAPP_CLIENT_ID`: Client ID for WhatsApp (default: 'dr-agarwal-workshop')
 - `WHATSAPP_TIMEOUT`: Timeout in ms for WhatsApp operations (default: 60000)
+- `WHATSAPP_PHONE_NUMBER`: Your WhatsApp phone number with country code (e.g., 919XXXXXXXXX)
+- `WHATSAPP_DEFAULT_COUNTRY_CODE`: Default country code to add to numbers (default: 91 for India)
 
 ## Troubleshooting
 

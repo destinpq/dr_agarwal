@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
   experimental: {
     serverActions: {
       allowedOrigins: [
@@ -14,7 +13,8 @@ const nextConfig = {
   },
   transpilePackages: ['antd', '@ant-design', 'rc-util', 'rc-pagination', 'rc-picker'],
   async rewrites() {
-    const API_URL = process.env.API_URL || 'http://localhost:31678';
+    const API_URL = process.env.API_URL || 'http://localhost:3001';
+    console.log('Using API URL:', API_URL);
     return [
       {
         source: '/api/registrations/:path*',
@@ -28,6 +28,4 @@ const nextConfig = {
   },
 }
 
-// Note: When using "output: standalone" configuration,
-// use "node .next/standalone/server.js" instead of "next start"
 module.exports = nextConfig 

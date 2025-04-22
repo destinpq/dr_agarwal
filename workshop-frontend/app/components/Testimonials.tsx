@@ -56,6 +56,14 @@ const Testimonials = () => {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.2 }}
+      style={{ 
+        width: '100%', 
+        maxWidth: '1200px',
+        boxSizing: 'border-box',
+        overflow: 'visible',
+        margin: '3rem auto',
+        padding: '0 1rem'
+      }}
     >
       <Title level={2} style={{ 
         textAlign: 'center', 
@@ -83,22 +91,41 @@ const Testimonials = () => {
         autoplaySpeed={5000}
         pauseOnHover
         className="testimonial-carousel"
+        style={{
+          width: '100%',
+          maxWidth: '100%',
+          overflow: 'hidden'
+        }}
       >
         {testimonials.map((testimonial, index) => (
-          <div key={index} className="testimonial-slide">
+          <div key={index} className="testimonial-slide" style={{ width: '100%', padding: '20px 0' }}>
             <Card 
               className="testimonial-card"
               style={{
                 borderRadius: '16px',
-                margin: '10px 20px 30px',
-                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.08)'
+                margin: '10px auto 30px',
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.08)',
+                width: 'calc(100% - 40px)',
+                maxWidth: '800px',
+                padding: '30px',
+                position: 'relative',
+                transition: 'all 0.3s ease'
               }}
             >
-              <div className="testimonial-quote-icon">
+              <div className="testimonial-quote-icon" style={{
+                position: 'absolute',
+                top: '15px',
+                right: '20px',
+                opacity: 0.8
+              }}>
                 <MessageOutlined style={{ fontSize: 30, color: 'rgba(114, 46, 209, 0.15)' }} />
               </div>
               
-              <div className="testimonial-content">
+              <div className="testimonial-content" style={{
+                marginBottom: '20px',
+                position: 'relative',
+                zIndex: 1
+              }}>
                 <Text style={{ fontSize: '16px', lineHeight: 1.6, color: '#555', fontStyle: 'italic' }}>
                   &ldquo;{testimonial.comment}&rdquo;
                 </Text>

@@ -8,14 +8,21 @@ export class WhatsAppService implements OnModuleInit {
   private client: Client;
   private isReady = false;
   private messageQueue: { to: string; message: string; mediaData?: Buffer; mediaType?: string }[] = [];
+  private defaultCountryCode: string;
+  private whatsappPhoneNumber: string;
 
   constructor(private readonly configService: ConfigService) {
     // Get configuration from environment variables via ConfigService
     const sessionPath = this.configService.get<string>('WHATSAPP_SESSION_PATH', './whatsapp-sessions');
     const clientId = this.configService.get<string>('WHATSAPP_CLIENT_ID', 'dr-agarwal-workshop');
     const timeout = parseInt(this.configService.get<string>('WHATSAPP_TIMEOUT', '60000'), 10);
+    this.defaultCountryCode = this.configService.get<string>('WHATSAPP_DEFAULT_COUNTRY_CODE', '91');
+    this.whatsappPhoneNumber = this.configService.get<string>('WHATSAPP_PHONE_NUMBER', '');
     
     this.logger.log(`Initializing WhatsApp with sessionPath=${sessionPath}, clientId=${clientId}`);
+    if (this.whatsappPhoneNumber) {
+      this.logger.log(`Using WhatsApp number: ${this.whatsappPhoneNumber}`);
+    }
     
     // Initialize WhatsApp client with LocalAuth to maintain session persistence
     this.client = new Client({
@@ -194,11 +201,12 @@ export class WhatsAppService implements OnModuleInit {
       cleaned = cleaned.substring(1);
     }
     
-    // Add country code if not present (for Indian numbers)
-    if (!cleaned.startsWith('91') && cleaned.length === 10) {
-      cleaned = `91${cleaned}`;
+    // Add country code if not present
+    if (!cleaned.startsWith(this.defaultCountryCode) && cleaned.length === 10) {
+      cleaned = `${this.defaultCountryCode}${cleaned}`;
     }
     
+    this.logger.log(`Formatted phone number ${phone} to ${cleaned}`);
     return cleaned;
   }
 } 

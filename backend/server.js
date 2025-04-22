@@ -8,7 +8,17 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+// Load environment variables if dotenv is available
+try {
+  const dotenv = require('dotenv');
+  dotenv.config();
+  console.log('Environment variables loaded from .env file');
+} catch (error) {
+  console.log('Dotenv not available, using process.env directly');
+}
+
 console.log('Starting combined server for NestJS backend + Health Check');
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 
 // Start health check server
 const healthServer = http.createServer((req, res) => {
@@ -17,7 +27,8 @@ const healthServer = http.createServer((req, res) => {
   res.end('OK');
 });
 
-const HEALTH_PORT = parseInt(process.env.PORT || '8080', 10);
+// Digital Ocean expects health checks on port 8080
+const HEALTH_PORT = parseInt(process.env.HEALTH_PORT || '8080', 10);
 healthServer.listen(HEALTH_PORT, '0.0.0.0', () => {
   console.log(`Health check server running on http://0.0.0.0:${HEALTH_PORT}`);
 });
@@ -44,14 +55,13 @@ function startNestJSApp() {
       console.log(`Found main.js at ${mainJsPath}`);
       
       // Set environment variables
-      process.env.NODE_ENV = 'production';
+      process.env.NODE_ENV = process.env.NODE_ENV || 'production';
       
-      // Default API port to 3000 if not set
-      if (!process.env.API_PORT) {
-        process.env.API_PORT = '3000';
-      }
+      // Use the PORT from .env for the main API (default to 3000 if not set)
+      const apiPort = process.env.PORT || '3000';
+      process.env.API_PORT = apiPort;
       
-      console.log(`Starting NestJS on port ${process.env.API_PORT}`);
+      console.log(`Starting NestJS on port ${apiPort}`);
       
       // Load the NestJS app
       require('./dist/main');

@@ -25,11 +25,15 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  max-width: 100%;
 }
 
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 body {
@@ -47,24 +51,31 @@ body {
   align-items: center;
   justify-content: flex-start;
   overflow-x: hidden;
+  width: 100vw;
+  max-width: 100vw;
 }
 
 /* Main container */
 .container {
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
+  max-width: 100vw !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-x: hidden;
+  position: relative;
+  left: 0;
+  right: 0;
 }
 
 /* Hero section */
 .hero-section {
-  width: 100%;
-  padding: 3rem 1.5rem 2.5rem;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  padding: 0 0 2.5rem;
   background: linear-gradient(135deg, #f0e6ff 0%, #f9f8ff 100%);
   display: flex;
   flex-direction: column;
@@ -99,33 +110,35 @@ body {
   display: flex;
   justify-content: center;
   margin: 0 auto 2rem;
-  width: 100%;
-  max-width: 600px;
-  padding: 1rem;
+  width: 100vw;
+  max-width: 100vw;
+  padding: 0;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 15px;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
 
 .logo-container img {
-  max-width: 100%;
+  width: 100vw;
+  max-width: 100vw;
   height: auto;
-  object-fit: contain;
-  border-radius: 15px;
+  object-fit: cover;
+  border-radius: 0;
   box-shadow: 0 10px 25px rgba(103, 80, 164, 0.15);
 }
 
 @media (max-width: 768px) {
   .logo-container {
-    max-width: 450px;
     margin-bottom: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .logo-container {
-    max-width: 320px;
     margin-bottom: 1rem;
-    padding: 0.5rem;
   }
 }
 
@@ -139,8 +152,8 @@ body {
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(103, 80, 164, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  max-width: 800px;
-  width: 90%;
+  max-width: calc(100% - 2rem);
+  width: 100%;
 }
 
 .hero-section h2, .hero-section h3 {
@@ -161,12 +174,14 @@ body {
 
 /* Content container */
 .content-container {
-  width: 100%;
-  max-width: 1000px;
-  padding: var(--spacing-xl);
-  margin: 0 auto;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  padding: var(--spacing-xl) 0;
+  margin: 0 !important;
   position: relative;
   z-index: 2;
+  left: 0;
+  right: 0;
 }
 
 /* Workshop Benefits section */
@@ -174,7 +189,11 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
-  margin: 2.5rem 0;
+  margin: 2.5rem 1rem;
+  width: 100% !important;
+  max-width: 1200px !important;
+  padding: 0 !important;
+  box-sizing: border-box;
 }
 
 .benefit-card {
@@ -189,6 +208,10 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  margin: 0 auto;
+  overflow: visible !important;
+  box-sizing: border-box;
+  width: 100% !important;
 }
 
 .benefit-card:hover {
@@ -200,12 +223,16 @@ body {
 .benefit-icon {
   width: 60px;
   height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   background-color: rgba(103, 80, 164, 0.1);
   border-radius: 50%;
   margin-bottom: 1rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+  overflow: visible !important;
 }
 
 .benefit-title {
@@ -213,17 +240,20 @@ body {
   font-weight: 600;
   color: #222;
   margin-bottom: 0.75rem;
+  text-align: center;
 }
 
 .benefit-description {
   color: #666;
   font-size: 0.95rem;
   line-height: 1.5;
+  text-align: center;
 }
 
 /* Form Styling Enhancements */
 .registration-form {
-  max-width: 900px;
+  max-width: calc(100% - 2rem);
+  width: 100%;
   margin: 2rem auto;
   padding: 2rem;
   border-radius: 20px;
@@ -752,11 +782,13 @@ body {
 /* Testimonials Section Styling */
 .testimonials-section {
   margin: 3rem 0;
-  padding: 0 1rem;
+  padding: 0;
+  width: 100%;
 }
 
 .testimonial-carousel {
-  max-width: 800px;
+  max-width: calc(100% - 2rem);
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -970,4 +1002,194 @@ html {
 
 .submit-button:hover {
   background-color: #4527a0;
+}
+
+/* Contact section styling */
+motion.div[style*="marginTop: 60px"] {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+/* Force all sections to full width */
+.content-container > * {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  box-sizing: border-box;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow: visible;
+}
+
+.content-container > motion.div {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  overflow: visible;
+}
+
+/* Card containers */
+.ant-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.workshop-benefits-grid {
+  width: 100% !important;
+  max-width: 1200px !important;
+  padding: 0 1rem !important;
+  margin: 2.5rem auto !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+/* Make sure Ant Design icons always display properly */
+.anticon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 1em !important;
+  min-height: 1em !important;
+  overflow: visible !important;
+}
+
+/* Fix flex display issue on mobile */
+@media (max-width: 768px) {
+  .benefit-icon {
+    width: 50px !important;
+    height: 50px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .benefit-card {
+    padding: 1rem !important;
+  }
+  
+  .benefit-title {
+    font-size: 1.1rem !important;
+  }
+  
+  .workshop-benefits-grid {
+    gap: 1rem !important;
+  }
+}
+
+/* Add these CSS rules to the end of the file */
+
+/* Force proper icon display */
+svg {
+  display: inline-block !important;
+  vertical-align: middle !important;
+  overflow: visible !important;
+}
+
+/* Fix for Ant Design icons specifically */
+.anticon svg {
+  display: inline-block !important;
+  overflow: visible !important;
+}
+
+/* Global fixes for container sizing */
+.container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.hero-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+.logo-container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  left: auto !important;
+  right: auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  position: relative !important;
+}
+
+.logo-container img {
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 16px !important;
+}
+
+.content-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .benefit-card {
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+  
+  .workshop-benefits-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  .testimonial-card {
+    padding: 20px !important;
+  }
+  
+  .testimonial-content {
+    font-size: 14px !important;
+  }
+  
+  .anticon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* Fix for overflow on iOS devices */
+@supports (-webkit-overflow-scrolling: touch) {
+  body, 
+  .container, 
+  .content-container, 
+  .hero-section, 
+  section {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  
+  .anticon,
+  .benefit-icon,
+  svg {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+  }
+}
+
+/* Override any hidden icons with !important */
+.benefit-icon .anticon,
+.benefit-icon svg {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  z-index: 10 !important;
+  position: relative !important;
 } 

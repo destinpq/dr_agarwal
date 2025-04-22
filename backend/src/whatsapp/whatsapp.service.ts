@@ -10,15 +10,23 @@ export class WhatsAppService implements OnModuleInit {
   private messageQueue: { to: string; message: string; mediaData?: Buffer; mediaType?: string }[] = [];
 
   constructor(private readonly configService: ConfigService) {
+    // Get configuration from environment variables via ConfigService
+    const sessionPath = this.configService.get<string>('WHATSAPP_SESSION_PATH', './whatsapp-sessions');
+    const clientId = this.configService.get<string>('WHATSAPP_CLIENT_ID', 'dr-agarwal-workshop');
+    const timeout = parseInt(this.configService.get<string>('WHATSAPP_TIMEOUT', '60000'), 10);
+    
+    this.logger.log(`Initializing WhatsApp with sessionPath=${sessionPath}, clientId=${clientId}`);
+    
     // Initialize WhatsApp client with LocalAuth to maintain session persistence
     this.client = new Client({
       authStrategy: new LocalAuth({
-        clientId: 'dr-agarwal-workshop',
-        dataPath: './whatsapp-sessions'
+        clientId: clientId,
+        dataPath: sessionPath
       }),
       puppeteer: {
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        timeout: timeout
       }
     });
 

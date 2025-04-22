@@ -36,6 +36,35 @@ The application serves health checks at:
 - Root (`/`) - Returns simple "OK" text response via the health check server on port 8080
 - `/health` - Returns JSON with status information
 
+## Environment Variables
+
+The application uses the following environment variables:
+
+### Server Configuration
+- `PORT`: Controls the port for the main application (default: 3001)
+- `HEALTH_PORT`: Controls the port for the health check server (default: 8080)
+- `NODE_ENV`: Set to 'production' in the Digital Ocean environment
+
+### Database Configuration
+- `DB_HOST`: The database host address
+- `DB_PORT`: The database port
+- `DB_NAME`: The database name
+- `DB_USER`: The database username
+- `DB_PASSWORD`: The database password
+- `DB_SSL_MODE`: Usually 'require' for production
+
+### Email Configuration
+- `EMAIL_HOST`: SMTP server host
+- `EMAIL_PORT`: SMTP server port
+- `EMAIL_USER`: SMTP username
+- `EMAIL_PASSWORD`: SMTP password
+- `EMAIL_FROM`: From email address
+
+### WhatsApp Configuration
+- `WHATSAPP_SESSION_PATH`: Path to store WhatsApp sessions (default: './whatsapp-sessions')
+- `WHATSAPP_CLIENT_ID`: Client ID for WhatsApp (default: 'dr-agarwal-workshop')
+- `WHATSAPP_TIMEOUT`: Timeout in ms for WhatsApp operations (default: 60000)
+
 ## Troubleshooting
 
 ### Error: Cannot find module '/workspace/backend/dist/main.js'
@@ -53,12 +82,6 @@ This means the application is not properly listening on port 8080. To fix:
 1. Verify the `PORT` environment variable is set to 8080 or the app defaults to 8080
 2. Make sure the application is binding to `0.0.0.0` (all interfaces) and not just localhost
 3. Check for any firewall or networking issues
-
-## Environment Variables
-
-- `PORT`: Controls the port for the health check server (default: 8080)
-- `API_PORT`: Controls the port for the NestJS application (default: 3000)
-- `NODE_ENV`: Set to 'production' in the Digital Ocean environment
 
 ## Local Testing
 

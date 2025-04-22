@@ -12,14 +12,14 @@ This document explains how this NestJS backend is configured for deployment on D
 When deployed to Digital Ocean App Platform:
 
 1. Files are mounted at `/workspace`
-2. Health checks are performed on port 8080
+2. Health checks are performed on port 8081
 3. The NestJS API runs on the port specified by API_PORT (defaults to 3000)
 
 ## The Deployment Architecture
 
 This application uses a dual-server approach:
 
-1. **Health Check Server**: Runs on port 8080 to respond to Digital Ocean's health probes
+1. **Health Check Server**: Runs on port 8081 to respond to Digital Ocean's health probes
 2. **NestJS API Server**: Runs your NestJS application on the configured port
 
 ## How It Works
@@ -33,7 +33,7 @@ When the application is deployed:
 ## Health Checks
 
 The application serves health checks at:
-- Root (`/`) - Returns simple "OK" text response via the health check server on port 8080
+- Root (`/`) - Returns simple "OK" text response via the health check server on port 8081
 - `/health` - Returns JSON with status information
 
 ## Environment Variables
@@ -42,7 +42,7 @@ The application uses the following environment variables:
 
 ### Server Configuration
 - `PORT`: Controls the port for the main application (default: 3001)
-- `HEALTH_PORT`: Controls the port for the health check server (default: 8080)
+- `HEALTH_PORT`: Controls the port for the health check server (default: 8081)
 - `NODE_ENV`: Set to 'production' in the Digital Ocean environment
 
 ### Database Configuration
@@ -79,9 +79,9 @@ This error occurs when the build process fails. To fix:
 
 ### Connection refused on health check
 
-This means the application is not properly listening on port 8080. To fix:
+This means the application is not properly listening on port 8081. To fix:
 
-1. Verify the `PORT` environment variable is set to 8080 or the app defaults to 8080
+1. Verify the `PORT` environment variable is set to 8081 or the app defaults to 8081
 2. Make sure the application is binding to `0.0.0.0` (all interfaces) and not just localhost
 3. Check for any firewall or networking issues
 
@@ -97,7 +97,7 @@ npm run build
 npm start
 
 # Test health check
-curl http://localhost:8080/health
+curl http://localhost:8081/health
 
 # Test NestJS API
 curl http://localhost:3000

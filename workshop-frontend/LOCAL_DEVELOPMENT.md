@@ -28,7 +28,7 @@ API_URL=http://localhost:3001
 
 # Server Ports
 PORT=3000
-HEALTH_PORT=8080
+HEALTH_PORT=8081
 
 # Next.js Environment
 NODE_ENV=development

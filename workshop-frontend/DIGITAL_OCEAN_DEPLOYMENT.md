@@ -18,7 +18,7 @@ The application uses the following environment variables:
 
 ### Server Configuration
 - `PORT`: The port for the Next.js application (default: 3001)  
-- `HEALTH_PORT`: The port for the health check server (default: 8080)
+- `HEALTH_PORT`: The port for the health check server (default: 8081)
 - `NODE_ENV`: The environment (should be 'production' for deployment)
 - `NEXT_PUBLIC_SITE_URL`: The public URL of the frontend
 
@@ -26,7 +26,7 @@ The application uses the following environment variables:
 
 This application uses a dual-server approach:
 
-1. **Health Check Server**: A simple HTTP server that listens on port 8080
+1. **Health Check Server**: A simple HTTP server that listens on port 8081
 2. **Next.js Server**: The main Next.js application that serves the frontend
 
 ## How It Works
@@ -47,17 +47,17 @@ API requests are routed to the backend using Next.js rewrites in next.config.js:
 
 ## Health Checks
 
-Digital Ocean monitors the application's health by making requests to port 8080.
+Digital Ocean monitors the application's health by making requests to port 8081.
 The health check server responds with a 200 OK status to indicate that the application is running.
 
 ## Troubleshooting
 
 ### Health Check Failures
 
-If you see errors like "Readiness probe failed: dial tcp 10.244.x.x:8080: connect: connection refused", check:
+If you see errors like "Readiness probe failed: dial tcp 10.244.x.x:8081: connect: connection refused", check:
 
 1. The server.js file is correctly starting the health check server
-2. The HEALTH_PORT environment variable is set to 8080
+2. The HEALTH_PORT environment variable is set to 8081
 3. There are no errors in the server logs
 
 ### API Connection Issues
@@ -83,7 +83,7 @@ npm run build
 npm start
 
 # Check if the health server is running
-curl http://localhost:8080
+curl http://localhost:8081
 
 # Check if the Next.js application is running
 curl http://localhost:3001

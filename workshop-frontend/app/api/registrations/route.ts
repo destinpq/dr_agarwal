@@ -5,12 +5,12 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     
-    // Forward the request to the backend API with correct port
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:31678';
+    // Forward the request to the backend API with correct URL
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://plankton-app-jrxs6.ondigitalocean.app';
     
-    console.log('Forwarding registration to:', `${backendUrl}/registrations`);
+    console.log('Forwarding registration to:', `${backendUrl}/api/registrations`);
     
-    const response = await fetch(`${backendUrl}/registrations`, {
+    const response = await fetch(`${backendUrl}/api/registrations`, {
       method: 'POST',
       body: formData,
     });
@@ -44,13 +44,15 @@ export async function POST(req: NextRequest) {
     
     try {
       const data = await response.json();
+      console.log('Registration successful, received data:', data);
       return NextResponse.json(data);
     } catch (jsonError) {
       // If the backend didn't return valid JSON for some reason
       console.error('Error parsing JSON response:', jsonError);
+      // Return a clearer error message instead of a fake success
       return NextResponse.json(
-        { id: 'unknown', status: 'created' },
-        { status: 201 }
+        { error: 'Backend returned invalid data. Please contact support.' },
+        { status: 500 }
       );
     }
   } catch (error) {
@@ -66,7 +68,7 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const formData = await req.formData();
-    const id = formData.get('id') as string;
+    const id = req.nextUrl.searchParams.get('id') || formData.get('id') as string;
     
     if (!id) {
       return NextResponse.json(
@@ -75,12 +77,19 @@ export async function PATCH(req: NextRequest) {
       );
     }
     
-    // Forward the request to the backend API with correct port
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:31678';
+    if (id === 'unknown') {
+      return NextResponse.json(
+        { error: 'Invalid registration ID. Please start registration again.' },
+        { status: 400 }
+      );
+    }
     
-    console.log('Updating registration:', `${backendUrl}/registrations/${id}`);
+    // Forward the request to the backend API with correct URL
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://plankton-app-jrxs6.ondigitalocean.app';
     
-    const response = await fetch(`${backendUrl}/registrations/${id}`, {
+    console.log('Updating registration:', `${backendUrl}/api/registrations/${id}`);
+    
+    const response = await fetch(`${backendUrl}/api/registrations/${id}`, {
       method: 'PATCH',
       body: formData,
     });
@@ -114,13 +123,15 @@ export async function PATCH(req: NextRequest) {
     
     try {
       const data = await response.json();
+      console.log('Update successful, received data:', data);
       return NextResponse.json(data);
     } catch (jsonError) {
       // If the backend didn't return valid JSON for some reason
       console.error('Error parsing JSON response:', jsonError);
+      // Return a clearer error message
       return NextResponse.json(
-        { id: id, status: 'updated' },
-        { status: 200 }
+        { error: 'Backend returned invalid data. Please contact support.' },
+        { status: 500 }
       );
     }
   } catch (error) {

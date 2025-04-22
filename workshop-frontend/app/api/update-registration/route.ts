@@ -22,8 +22,8 @@ export async function POST(request: Request) {
     
     console.log(`Processing update for registration ID: ${id}`);
     
-    // Use environment variable or fallback to production URL
-    const backendUrl = process.env.BACKEND_URL || 'https://plankton-app-jrxs6.ondigitalocean.app';
+    // Get environment variables or fallback to local development
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/api';
     console.log(`Updating registration at: ${backendUrl}/api/registrations/${id}`);
     
     // Create a new FormData with ONLY payment-related fields

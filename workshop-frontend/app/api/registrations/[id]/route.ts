@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Get environment variables or fallback to local development
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:8080/api';
+
+// Define correct types for the PATCH method
+type RouteParams = {
+  params: {
+    id: string;
+  };
+};
+
 // API endpoint for updating a registration by ID
 export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: RouteParams
 ) {
   try {
-    const formData = await request.formData();
+    const formData = await req.formData();
     const id = params.id;
     
     if (!id) {
@@ -25,8 +35,6 @@ export async function PATCH(
     
     console.log(`Processing update for registration ID: ${id}`);
     
-    // Use environment variable or fallback to production URL
-    const backendUrl = process.env.BACKEND_URL || 'https://plankton-app-jrxs6.ondigitalocean.app';
     console.log(`Updating registration at: ${backendUrl}/api/registrations/${id}`);
     
     // Log the formData contents for debugging

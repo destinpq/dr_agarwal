@@ -52,8 +52,17 @@ export class WhatsAppService implements OnModuleInit {
   private setupEventListeners() {
     // Handle QR code generation (only needed on first run)
     this.client.on('qr', (qr) => {
-      // We're not logging the QR code, just noting that it was received
-      this.logger.log('WhatsApp authentication required - client needs a one-time setup with QR code.');
+      // Log the QR code in a format that can be displayed in terminal
+      this.logger.log('WhatsApp QR Code received. Scan with your phone:');
+      
+      // Create a simple ASCII QR code representation
+      const qrLines = this.generateAsciiQR(qr);
+      
+      // Log each line of the QR code
+      qrLines.forEach(line => console.log(line));
+      
+      this.logger.log('If QR code is not visible, use this string to generate it:');
+      this.logger.log(qr);
     });
 
     // Handle ready state
@@ -73,6 +82,34 @@ export class WhatsAppService implements OnModuleInit {
       this.isReady = false;
       this.logger.warn('WhatsApp client disconnected');
     });
+  }
+
+  /**
+   * Generate a simple ASCII QR code for console display
+   * This is a very basic implementation - in production you might want to use qrcode-terminal
+   */
+  private generateAsciiQR(qr: string): string[] {
+    // Log the QR string directly
+    this.logger.log('Scan this QR code with WhatsApp on your phone:');
+    this.logger.log('---------------------------------------------');
+    this.logger.log(`QR Code: ${qr}`);
+    this.logger.log('---------------------------------------------');
+    this.logger.log('If you cannot see a QR code above, please install qrcode-terminal package');
+    this.logger.log('or use an online QR code generator with the string above.');
+    
+    return [
+      '████████████████████████████████',
+      '█                              █',
+      '█  Scan this QR code with the  █',
+      '█  WhatsApp mobile app.        █',
+      '█                              █',
+      '█  If you cannot see a QR code █',
+      '█  in this console, copy the   █',
+      '█  string above and use an     █',
+      '█  online QR generator.        █',
+      '█                              █',
+      '████████████████████████████████'
+    ];
   }
 
   /**

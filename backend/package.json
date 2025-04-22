@@ -12,41 +12,43 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main.js",
     "lint": "eslint \"{src,apps,libs}/**/*.ts\"",
-    "health": "curl -v localhost:8080/health || echo 'Health check failed'"
+    "health": "curl -v localhost:8081/health || echo 'Health check failed'"
   },
   "engines": {
     "node": "20.18.3"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.9.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "3.1.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "10.0.0",
     "@nestjs/typeorm": "10.0.0",
-    "@nestjs-modules/mailer": "^1.9.1",
+    "@types/express": "4.17.21",
+    "@types/multer": "^1.4.11",
+    "@types/node": "20.11.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.0",
     "dotenv": "^16.5.0",
+    "multer": "^1.4.5-lts.1",
     "pg": "^8.11.3",
+    "qrcode-terminal": "^0.12.0",
     "reflect-metadata": "0.1.13",
     "rimraf": "5.0.5",
     "rxjs": "7.8.1",
     "typeorm": "0.3.17",
-    "whatsapp-web.js": "^1.23.0",
-    "multer": "^1.4.5-lts.1",
-    "@types/express": "4.17.21",
-    "@types/node": "20.11.0",
-    "@types/multer": "^1.4.11",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "whatsapp-web.js": "^1.23.0"
   },
   "devDependencies": {
     "@nestjs/cli": "10.0.0",
     "@nestjs/schematics": "10.0.0",
     "@nestjs/testing": "10.0.0",
     "@types/jest": "^29.5.11",
+    "@types/qrcode-terminal": "^0.12.2",
     "@types/supertest": "^6.0.2",
-    "supertest": "^6.3.4",
     "source-map-support": "0.5.21",
+    "supertest": "^6.3.4",
     "ts-loader": "9.5.1",
     "ts-node": "10.9.1",
     "tsconfig-paths": "4.2.0"

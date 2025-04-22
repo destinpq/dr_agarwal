@@ -22,5 +22,6 @@
       "*": ["node_modules/*"]
     },
     "typeRoots": ["./node_modules/@types"]
-  }
+  },
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 } 

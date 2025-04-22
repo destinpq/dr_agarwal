@@ -33,14 +33,18 @@ const nextConfig = {
     return [
       {
         source: '/api/registrations/:path*',
-        destination: `${BACKEND_URL}/registrations/:path*`,
+        destination: `${BACKEND_URL}/api/registrations/:path*`,
       },
       {
         source: '/api/registrations',
-        destination: `${BACKEND_URL}/registrations`,
+        destination: `${BACKEND_URL}/api/registrations`,
       }
     ];
   },
+  
+  // Exclude problematic route from build
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
+  excludeRoutes: ['/api/registrations/[id]'],
 }
 
 module.exports = nextConfig 

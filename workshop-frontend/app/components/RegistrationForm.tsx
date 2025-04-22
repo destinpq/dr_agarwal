@@ -56,6 +56,7 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showPaymentUpload, setShowPaymentUpload] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { 
     control, 
@@ -75,7 +76,13 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   };
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    if (isSubmitting) {
+      console.log('Preventing duplicate submission');
+      return;
+    }
+    
     setIsLoading(true);
+    setIsSubmitting(true);
     
     try {
       // Validate all required fields are present
@@ -140,7 +147,12 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       
       // Add payment screenshot if available
       if (showPaymentUpload && data.paymentScreenshot && data.paymentScreenshot.length > 0) {
-        formData.append('paymentScreenshot', data.paymentScreenshot[0] as unknown as File);
+        const screenshot = data.paymentScreenshot[0];
+        console.log('Adding payment screenshot to form data:', screenshot.name, screenshot.type, screenshot.size);
+        
+        // Make sure we're getting the actual File object from the FileList
+        const file = data.paymentScreenshot[0] as unknown as File;
+        formData.append('paymentScreenshot', file, file.name);
       }
       
       // Debug log the form data being sent
@@ -149,13 +161,49 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       let response;
       let responseData;
       
+      // Log browser environment variables
+      console.log('Environment check:', {
+        NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL || 'not set',
+        window_location: window.location.href,
+        hostname: window.location.hostname
+      });
+
+      // Determine if we're running on goldfish-app
+      const isGoldfishApp = window.location.hostname.includes('goldfish-app');
+      // Use a local development URL with /api prefix as default
+      let apiEndpoint = '/api/registrations';
+      
+      if (isGoldfishApp) {
+        // Use localhost URL for local development
+        apiEndpoint = 'http://localhost:8080/api/registrations';
+        console.log('Using API endpoint:', apiEndpoint);
+      }
+      
       if (!showPaymentUpload) {
         // First step - create registration
         console.log('Submitting registration - Step 1: Initial registration');
-        response = await fetch('/api/registrations', {
-          method: 'POST',
-          body: formData,
-        });
+        
+        try {
+          // Added timeout to prevent hanging requests
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+          
+          response = await fetch(apiEndpoint, {
+            method: 'POST',
+            body: formData,
+            signal: controller.signal,
+            credentials: 'same-origin'
+          });
+          
+          clearTimeout(timeoutId);
+          
+        } catch (fetchError: unknown) {
+          console.error('Fetch error:', fetchError);
+          if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+            throw new Error('Request timed out. Please try again later.');
+          }
+          throw new Error('Network error: ' + ((fetchError as Error)?.message || 'Failed to connect to server'));
+        }
       } else {
         // Update with payment
         const registrationId = localStorage.getItem('registrationId');
@@ -176,10 +224,22 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        response = await fetch(`/api/registrations?id=${registrationId}`, {
-          method: 'PATCH',
-          body: formData,
-        });
+        // Use the new dedicated update endpoint instead of the dynamic route
+        const updateEndpoint = `/api/update-registration`;
+        
+        console.log('Using update endpoint:', updateEndpoint);
+        
+        try {
+          response = await fetch(updateEndpoint, {
+            method: 'POST', // Changed to POST since the new endpoint uses POST
+            body: formData,
+            credentials: 'same-origin'
+          });
+          
+        } catch (fetchError: unknown) {
+          console.error('Fetch error:', fetchError);
+          throw new Error('Network error: ' + ((fetchError as Error)?.message || 'Failed to connect to server'));
+        }
       }
       
       console.log('API response status:', response.status);
@@ -192,13 +252,21 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         let errorMessage = 'Failed to process registration';
         
         try {
+          // Get detailed error information
+          console.log('Detailed error response:');
+          console.log('- Status:', response.status);
+          console.log('- Status Text:', response.statusText);
+          console.log('- URL:', response.url);
+          console.log('- Headers:', Object.fromEntries(response.headers.entries()));
+          
           if (contentType && contentType.includes('application/json')) {
             const errorData = await response.json();
-            errorMessage = errorData.error || errorMessage;
+            console.log('- Error JSON data:', errorData);
+            errorMessage = errorData.error || errorData.message || errorMessage;
           } else {
             // Try to get response text if not JSON
             const errorText = await response.text();
-            console.log('Error response text:', errorText);
+            console.log('- Error Text:', errorText);
           }
         } catch (parseError) {
           console.error('Error parsing error response:', parseError);
@@ -252,6 +320,14 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           duration: 5
         });
         
+        // Add additional confirmation message
+        notification.info({
+          message: 'Confirmation',
+          description: `Your registration (ID: ${responseData.id}) has been received. An email confirmation with WhatsApp access details will be sent to ${data.email}.`,
+          placement: 'topRight',
+          duration: 10
+        });
+        
         // Clear local storage
         localStorage.removeItem('registrationId');
         
@@ -272,6 +348,8 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         placement: 'topRight',
         duration: 5
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

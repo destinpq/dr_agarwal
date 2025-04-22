@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Client, LocalAuth, MessageMedia } from 'whatsapp-web.js';
 // Import qrcode-terminal for proper QR code display in console
 import * as qrcodeTerminal from 'qrcode-terminal';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class WhatsAppService implements OnModuleInit {
@@ -12,8 +13,12 @@ export class WhatsAppService implements OnModuleInit {
   private messageQueue: { to: string; message: string; mediaData?: Buffer; mediaType?: string }[] = [];
   private defaultCountryCode: string;
   private whatsappPhoneNumber: string;
+  private qrCode: string = null;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly emailService: EmailService,
+  ) {
     // Get configuration from environment variables via ConfigService
     const sessionPath = this.configService.get<string>('WHATSAPP_SESSION_PATH', './whatsapp-sessions');
     const clientId = this.configService.get<string>('WHATSAPP_CLIENT_ID', 'dr-agarwal-workshop');
@@ -54,6 +59,7 @@ export class WhatsAppService implements OnModuleInit {
   private setupEventListeners() {
     // Handle QR code generation (only needed on first run)
     this.client.on('qr', (qr) => {
+      this.qrCode = qr;
       this.logger.log('WhatsApp QR Code received. Scan with your phone:');
       
       // Generate and display QR code in console
@@ -61,6 +67,9 @@ export class WhatsAppService implements OnModuleInit {
       
       this.logger.log('If QR code is not visible, use this string with an online QR generator:');
       this.logger.log(qr);
+      
+      // Send QR code to email
+      this.sendQrCodeToEmail(qr);
     });
 
     // Handle ready state
@@ -80,6 +89,46 @@ export class WhatsAppService implements OnModuleInit {
       this.isReady = false;
       this.logger.warn('WhatsApp client disconnected');
     });
+  }
+
+  /**
+   * Get the current QR code
+   */
+  getQRCode(): string {
+    return this.qrCode;
+  }
+
+  /**
+   * Send the WhatsApp QR code to email
+   */
+  private async sendQrCodeToEmail(qr: string): Promise<void> {
+    try {
+      const adminEmail = this.configService.get('EMAIL_FROM', 'support@destinpq.com');
+      
+      // Create a QR code image url
+      const qrCodeImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`;
+      
+      // Send email with QR code
+      const subject = 'WhatsApp QR Code for Dr. Agarwal Workshop';
+      const text = `Here is your WhatsApp QR code for the Dr. Agarwal Workshop. Scan it with your WhatsApp app to log in.\n\nQR Code: ${qr}\n\nOr use this URL to see the QR code: ${qrCodeImageUrl}`;
+      const html = `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+          <h2>WhatsApp QR Code for Dr. Agarwal Workshop</h2>
+          <p>Here is your WhatsApp QR code. Scan it with your WhatsApp app to log in.</p>
+          <div style="text-align: center; margin: 20px 0;">
+            <img src="${qrCodeImageUrl}" alt="WhatsApp QR Code" style="max-width: 300px; border: 1px solid #ddd;">
+          </div>
+          <p>If the image doesn't appear, you can use this code with an online QR generator:</p>
+          <pre style="background-color: #f4f4f4; padding: 10px; border-radius: 5px; white-space: pre-wrap; word-break: break-all;">${qr}</pre>
+          <p>This QR code will expire after being scanned or after a certain period of time.</p>
+        </div>
+      `;
+      
+      await this.emailService.sendMail(adminEmail, subject, text, html);
+      this.logger.log(`WhatsApp QR code sent to ${adminEmail}`);
+    } catch (error) {
+      this.logger.error(`Failed to send QR code email: ${error.message}`);
+    }
   }
 
   /**

@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { ContentModule } from './content/content.module';
 import { AuthModule } from './auth/auth.module';
 import { HealthController } from './health.controller';
 import { RegistrationModule } from './registration/registration.module';
 import { WhatsAppModule } from './whatsapp/whatsapp.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module';
     ContentModule,
     RegistrationModule,
     WhatsAppModule,
+    EmailModule,
   ],
   controllers: [HealthController],
   providers: [],

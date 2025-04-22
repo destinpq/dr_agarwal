@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContentModule } from './content/content.module';
 import { AuthModule } from './auth/auth.module';
 import { HealthController } from './health.controller';
+import { RegistrationModule } from './registration/registration.module';
+import { WhatsAppModule } from './whatsapp/whatsapp.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { HealthController } from './health.controller';
     // Feature modules
     AuthModule,
     ContentModule,
+    RegistrationModule,
+    WhatsAppModule,
   ],
   controllers: [HealthController],
   providers: [],

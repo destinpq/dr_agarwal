@@ -1,22 +1,43 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable standalone output mode for better deployment compatibility
   output: 'standalone',
+  
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', 'localhost:3001', 'localhost:31678', process.env.ALLOWED_HOST]
+      allowedOrigins: [
+        'localhost:3000', 
+        'localhost:3001', 
+        'localhost:31678',
+        'workshop.dragarwal.com',
+        '*.dragarwal.com'
+      ]
     }
   },
+  
+  // Ensure Ant Design components are properly transpiled
   transpilePackages: ['antd', '@ant-design', 'rc-util', 'rc-pagination', 'rc-picker'],
+  
+  // Add custom error handling
+  onDemandEntries: {
+    // period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 25 * 1000,
+    // number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 2,
+  },
+  
+  // Add API rewrites for backend communication
   async rewrites() {
-    const apiUrl = process.env.BACKEND_URL || 'http://localhost:31678';
+    const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:31678';
+    console.log('Using Backend URL:', BACKEND_URL);
     return [
       {
         source: '/api/registrations/:path*',
-        destination: `${apiUrl}/registrations/:path*`,
+        destination: `${BACKEND_URL}/registrations/:path*`,
       },
       {
         source: '/api/registrations',
-        destination: `${apiUrl}/registrations`,
+        destination: `${BACKEND_URL}/registrations`,
       }
     ];
   },

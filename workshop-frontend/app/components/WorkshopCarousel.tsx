@@ -34,7 +34,15 @@ export default function WorkshopCarousel() {
   return (
     <motion.div
       variants={cardVariants}
-      style={{ marginBottom: 40 }}
+      style={{ 
+        marginBottom: 40, 
+        width: '100%', 
+        maxWidth: '1200px',
+        boxSizing: 'border-box',
+        overflow: 'visible',
+        padding: '0 1rem',
+        margin: '0 auto'
+      }}
     >
       <Carousel 
         autoplay 
@@ -42,19 +50,22 @@ export default function WorkshopCarousel() {
         style={{ 
           borderRadius: 16, 
           overflow: 'hidden', 
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          width: '100%'
         }}
         accessibility={false}
         pauseOnFocus={true}
       >
         {workshopImages.map((image, index) => (
-          <div key={index}>
+          <div key={index} style={{ width: '100%' }}>
             <div style={{ 
               height: 300, 
               background: `url(${image.url})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              position: 'relative'
+              position: 'relative',
+              width: '100%',
+              borderRadius: '16px'
             }}>
               <div style={{
                 position: 'absolute',
@@ -64,7 +75,8 @@ export default function WorkshopCarousel() {
                 background: 'rgba(0,0,0,0.6)',
                 padding: '15px',
                 color: 'white',
-                textAlign: 'center'
+                textAlign: 'center',
+                borderRadius: '0 0 16px 16px'
               }}>
                 <Title level={4} style={{ color: 'white', margin: 0 }}>{image.title}</Title>
               </div>

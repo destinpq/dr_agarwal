@@ -147,6 +147,7 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       console.log('Form submission - fields:', Object.fromEntries(formData.entries()));
       
       let response;
+      let responseData;
       
       if (!showPaymentUpload) {
         // First step - create registration
@@ -158,7 +159,21 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       } else {
         // Update with payment
         const registrationId = localStorage.getItem('registrationId');
-        formData.append('id', registrationId || '');
+        
+        // Check if we have a valid ID
+        if (!registrationId || registrationId === 'unknown') {
+          console.error('Invalid registration ID:', registrationId);
+          notification.error({
+            message: 'Registration Error',
+            description: 'Could not find your registration. Please try registering again.',
+            placement: 'topRight',
+            duration: 5
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
         response = await fetch(`/api/registrations?id=${registrationId}`, {
@@ -192,14 +207,20 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         throw new Error(errorMessage);
       }
       
-      let responseData;
       try {
         responseData = await response.json();
         console.log('API response data:', responseData);
+        
+        // Verify we have a valid ID
+        if (!responseData.id || responseData.id === 'unknown') {
+          console.error('Invalid ID received from the server:', responseData.id);
+          throw new Error('Server returned an invalid registration ID. Please try again later.');
+        }
+        
       } catch (jsonError) {
         console.error('Error parsing response JSON:', jsonError);
         // Use a default response if JSON parsing fails
-        responseData = { success: true };
+        throw new Error('Could not process server response. Please try again.');
       }
       
       // Save registration ID for later update

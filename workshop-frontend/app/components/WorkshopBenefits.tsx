@@ -51,7 +51,11 @@ const containerVariants = {
 
 const WorkshopBenefits = () => {
   return (
-    <section className="benefits-section">
+    <section className="benefits-section" style={{ 
+      width: '100vw !important', 
+      maxWidth: '100vw !important',
+      overflow: 'visible'
+    }}>
       <Title level={2} style={{ 
         textAlign: 'center', 
         marginBottom: '2rem',
@@ -78,17 +82,69 @@ const WorkshopBenefits = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
+        style={{ 
+          width: '100%',
+          maxWidth: '1200px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '1.5rem',
+          margin: '2.5rem auto',
+          padding: '0 1rem',
+          boxSizing: 'border-box'
+        }}
       >
         {benefits.map((benefit, index) => (
-          <motion.div key={index} variants={cardVariants}>
+          <motion.div key={index} variants={cardVariants} style={{ width: '100%' }}>
             <Card 
               className="benefit-card"
               hoverable
+              style={{ 
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '1.5rem',
+                borderRadius: '16px',
+                border: '1px solid rgba(103, 80, 164, 0.1)',
+                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.05)',
+                transition: 'all 0.3s ease',
+                margin: '0 auto',
+                overflow: 'visible'
+              }}
             >
-              <div className="benefit-icon">{benefit.icon}</div>
-              <div className="benefit-title">{benefit.title}</div>
-              <Divider style={{ margin: '12px 0', borderColor: '#f0e6ff' }}/>
-              <div className="benefit-description">{benefit.description}</div>
+              <div className="benefit-icon" style={{
+                width: '60px',
+                height: '60px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(103, 80, 164, 0.1)',
+                borderRadius: '50%',
+                marginBottom: '1rem',
+                flexShrink: 0
+              }}>
+                {benefit.icon}
+              </div>
+              <div className="benefit-title" style={{
+                fontSize: '1.2rem',
+                fontWeight: 600,
+                color: '#222',
+                marginBottom: '0.75rem',
+                textAlign: 'center'
+              }}>
+                {benefit.title}
+              </div>
+              <Divider style={{ margin: '12px 0', borderColor: '#f0e6ff', width: '100%' }}/>
+              <div className="benefit-description" style={{
+                color: '#666',
+                fontSize: '0.95rem',
+                lineHeight: 1.5,
+                textAlign: 'center'
+              }}>
+                {benefit.description}
+              </div>
             </Card>
           </motion.div>
         ))}

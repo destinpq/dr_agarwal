@@ -8,7 +8,7 @@ const server: http.Server = http.createServer((req: http.IncomingMessage, res: h
   res.end('OK');
 });
 
-const PORT: number = parseInt(process.env.PORT || '8080', 10);
+const PORT: number = parseInt(process.env.PORT || '8081', 10);
 server.listen(PORT, '0.0.0.0', () => {
   const address = server.address() as AddressInfo;
   console.log(`Health check server running on http://${address.address}:${address.port}`);

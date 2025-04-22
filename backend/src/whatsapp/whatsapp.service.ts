@@ -1,6 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client, LocalAuth, MessageMedia } from 'whatsapp-web.js';
+// Import qrcode-terminal for proper QR code display in console
+import * as qrcodeTerminal from 'qrcode-terminal';
 
 @Injectable()
 export class WhatsAppService implements OnModuleInit {
@@ -8,17 +10,32 @@ export class WhatsAppService implements OnModuleInit {
   private client: Client;
   private isReady = false;
   private messageQueue: { to: string; message: string; mediaData?: Buffer; mediaType?: string }[] = [];
+  private defaultCountryCode: string;
+  private whatsappPhoneNumber: string;
 
   constructor(private readonly configService: ConfigService) {
+    // Get configuration from environment variables via ConfigService
+    const sessionPath = this.configService.get<string>('WHATSAPP_SESSION_PATH', './whatsapp-sessions');
+    const clientId = this.configService.get<string>('WHATSAPP_CLIENT_ID', 'dr-agarwal-workshop');
+    const timeout = parseInt(this.configService.get<string>('WHATSAPP_TIMEOUT', '60000'), 10);
+    this.defaultCountryCode = this.configService.get<string>('WHATSAPP_DEFAULT_COUNTRY_CODE', '91');
+    this.whatsappPhoneNumber = this.configService.get<string>('WHATSAPP_PHONE_NUMBER', '');
+    
+    this.logger.log(`Initializing WhatsApp with sessionPath=${sessionPath}, clientId=${clientId}`);
+    if (this.whatsappPhoneNumber) {
+      this.logger.log(`Using WhatsApp number: ${this.whatsappPhoneNumber}`);
+    }
+    
     // Initialize WhatsApp client with LocalAuth to maintain session persistence
     this.client = new Client({
       authStrategy: new LocalAuth({
-        clientId: 'dr-agarwal-workshop',
-        dataPath: './whatsapp-sessions'
+        clientId: clientId,
+        dataPath: sessionPath
       }),
       puppeteer: {
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        timeout: timeout
       }
     });
 
@@ -37,8 +54,13 @@ export class WhatsAppService implements OnModuleInit {
   private setupEventListeners() {
     // Handle QR code generation (only needed on first run)
     this.client.on('qr', (qr) => {
-      // We're not logging the QR code, just noting that it was received
-      this.logger.log('WhatsApp authentication required - client needs a one-time setup with QR code.');
+      this.logger.log('WhatsApp QR Code received. Scan with your phone:');
+      
+      // Generate and display QR code in console
+      qrcodeTerminal.generate(qr, { small: false });
+      
+      this.logger.log('If QR code is not visible, use this string with an online QR generator:');
+      this.logger.log(qr);
     });
 
     // Handle ready state
@@ -186,11 +208,12 @@ export class WhatsAppService implements OnModuleInit {
       cleaned = cleaned.substring(1);
     }
     
-    // Add country code if not present (for Indian numbers)
-    if (!cleaned.startsWith('91') && cleaned.length === 10) {
-      cleaned = `91${cleaned}`;
+    // Add country code if not present
+    if (!cleaned.startsWith(this.defaultCountryCode) && cleaned.length === 10) {
+      cleaned = `${this.defaultCountryCode}${cleaned}`;
     }
     
+    this.logger.log(`Formatted phone number ${phone} to ${cleaned}`);
     return cleaned;
   }
 } 

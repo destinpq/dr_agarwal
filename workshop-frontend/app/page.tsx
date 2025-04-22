@@ -3,14 +3,13 @@
 import { useState } from 'react';
 import { Typography, Badge, Card, Button } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FireOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, HeartOutlined } from '@ant-design/icons';
+import { FireOutlined, HeartOutlined } from '@ant-design/icons';
 import RegistrationForm from './components/RegistrationForm';
 import SuccessMessage from './components/SuccessMessage';
 import WorkshopBenefits from './components/WorkshopBenefits';
-import Testimonials from './components/Testimonials';
 import Logo from './components/Logo';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 export default function Home() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -36,6 +35,16 @@ export default function Home() {
       animate="visible"
       variants={containerVariants}
       className="container"
+      style={{
+        width: '100%',
+        maxWidth: '100%',
+        left: 0,
+        right: 0,
+        padding: 0,
+        margin: 0,
+        overflow: 'hidden',
+        position: 'relative'
+      }}
     >
       <section className="hero-section">
         <Logo />
@@ -49,6 +58,10 @@ export default function Home() {
             damping: 20, 
             stiffness: 100,
             delay: 0.2 
+          }}
+          style={{
+            width: '100%',
+            maxWidth: 'calc(100% - 2rem)'
           }}
         >
           <motion.div 
@@ -97,12 +110,22 @@ export default function Home() {
         <div className="hero-decoration right"></div>
       </section>
 
-      <div className="content-container">
+      <div className="content-container" style={{ 
+        width: '100%', 
+        maxWidth: '100%',
+        overflow: 'visible' 
+      }}>
         <WorkshopBenefits />
 
         <motion.div
           whileHover={{ boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}
-          style={{ marginBottom: 40 }}
+          style={{ 
+            marginBottom: 40, 
+            width: '100%', 
+            maxWidth: '1200px',
+            padding: '0 1rem',
+            margin: '0 auto'
+          }}
           id="registration-form"
         >
           <Card
@@ -123,7 +146,9 @@ export default function Home() {
             style={{ 
               borderRadius: 16, 
               boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              width: '100%',
+              maxWidth: '100%'
             }}
           >
             <AnimatePresence mode="wait">
@@ -135,123 +160,7 @@ export default function Home() {
             </AnimatePresence>
           </Card>
         </motion.div>
-
-        <Testimonials />
         
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true, amount: 0.1 }}
-          style={{ 
-            marginTop: 60, 
-            marginBottom: 40,
-            padding: '30px',
-            borderRadius: '20px',
-            backgroundColor: 'rgba(103, 80, 164, 0.05)',
-            boxShadow: '0 6px 24px rgba(103, 80, 164, 0.08)',
-            border: '1px solid rgba(103, 80, 164, 0.1)',
-          }}
-        >
-          <Title level={2} className="section-title-underline" style={{ 
-            textAlign: 'center', 
-            marginBottom: '35px',
-            position: 'relative',
-            display: 'inline-block',
-            left: '50%',
-            transform: 'translateX(-50%)'
-          }}>
-            Contact Us
-          </Title>
-          
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            gap: '20px',
-            justifyContent: 'center', 
-            alignItems: 'flex-start',
-            textAlign: 'center' 
-          }}>
-            <Card 
-              style={{ 
-                width: '300px', 
-                borderRadius: '15px',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-              }}
-              hoverable
-            >
-              <MailOutlined style={{ fontSize: '28px', color: '#722ed1', marginBottom: '10px' }} />
-              <Title level={4}>Email Us</Title>
-              <Paragraph>
-                <a href="mailto:support@destinpq.com" style={{ color: '#722ed1' }}>
-                  support@destinpq.com
-                </a>
-              </Paragraph>
-              <Paragraph type="secondary">For registrations and queries</Paragraph>
-            </Card>
-            
-            <Card 
-              style={{ 
-                width: '300px', 
-                borderRadius: '15px',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-              }}
-              hoverable
-            >
-              <PhoneOutlined style={{ fontSize: '28px', color: '#722ed1', marginBottom: '10px' }} />
-              <Title level={4}>Call Us</Title>
-              <Paragraph>
-                <a href="tel:+919876543210" style={{ color: '#722ed1' }}>
-                  +91 9876 543 210
-                </a>
-              </Paragraph>
-              <Paragraph type="secondary">Monday to Friday, 9am-5pm</Paragraph>
-            </Card>
-            
-            <Card 
-              style={{ 
-                width: '300px', 
-                borderRadius: '15px',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-              }}
-              hoverable
-            >
-              <GlobalOutlined style={{ fontSize: '28px', color: '#722ed1', marginBottom: '10px' }} />
-              <Title level={4}>Visit Us</Title>
-              <Paragraph>
-                <a href="https://destinpq.com" target="_blank" rel="noopener noreferrer" style={{ color: '#722ed1' }}>
-                  destinpq.com
-                </a>
-              </Paragraph>
-              <Paragraph type="secondary">Learn more about our services</Paragraph>
-            </Card>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          style={{ 
-            textAlign: 'center', 
-            marginTop: 40, 
-            marginBottom: 40, 
-            padding: '20px',
-            borderTop: '1px solid rgba(103, 80, 164, 0.1)'
-          }}
-        >
-          <Text type="secondary">
-            © 2023 Dr. Agarwal&apos;s Mental Healthcare Clinic. All rights reserved.
-          </Text>
-          <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
-            <Text type="secondary" style={{ cursor: 'pointer' }}>Privacy Policy</Text>
-            <Text type="secondary" style={{ cursor: 'pointer' }}>Terms of Service</Text>
-            <Text type="secondary" style={{ cursor: 'pointer' }}>FAQ</Text>
-          </div>
-        </motion.div>
       </div>
     </motion.div>
   );

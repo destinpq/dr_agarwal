@@ -5,8 +5,8 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     
-    // Use a single backend URL
-    const backendUrl = 'http://localhost:8080';
+    // Use environment variable or fallback to production URL
+    const backendUrl = process.env.BACKEND_URL || 'https://plankton-app-jrxs6.ondigitalocean.app';
     console.log('Forwarding registration to:', `${backendUrl}/api/registrations`);
     
     try {

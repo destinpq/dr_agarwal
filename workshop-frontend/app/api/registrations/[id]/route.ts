@@ -25,8 +25,8 @@ export async function PATCH(
     
     console.log(`Processing update for registration ID: ${id}`);
     
-    // Use a single backend URL
-    const backendUrl = 'http://localhost:8080';
+    // Use environment variable or fallback to production URL
+    const backendUrl = process.env.BACKEND_URL || 'https://plankton-app-jrxs6.ondigitalocean.app';
     console.log(`Updating registration at: ${backendUrl}/api/registrations/${id}`);
     
     // Log the formData contents for debugging

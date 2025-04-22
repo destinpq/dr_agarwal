@@ -27,8 +27,8 @@ const healthServer = http.createServer((req, res) => {
   res.end('OK');
 });
 
-// Digital Ocean expects health checks on port 8080
-const HEALTH_PORT = parseInt(process.env.HEALTH_PORT || '8080', 10);
+// Digital Ocean expects health checks on port 8081
+const HEALTH_PORT = parseInt(process.env.HEALTH_PORT || '8081', 10);
 healthServer.listen(HEALTH_PORT, '0.0.0.0', () => {
   console.log(`Health check server running on http://0.0.0.0:${HEALTH_PORT}`);
 });
@@ -50,7 +50,7 @@ function startNestJSApp() {
     console.log('Starting NestJS application...');
     
     // Check if the main.js file exists
-    const mainJsPath = path.join(__dirname, 'dist', 'main.js');
+    const mainJsPath = path.join(__dirname, 'dist', 'src', 'main.js');
     if (fs.existsSync(mainJsPath)) {
       console.log(`Found main.js at ${mainJsPath}`);
       
@@ -64,7 +64,7 @@ function startNestJSApp() {
       console.log(`Starting NestJS on port ${apiPort}`);
       
       // Load the NestJS app
-      require('./dist/main');
+      require('./dist/src/main');
       console.log('NestJS application started successfully');
     } else {
       console.error(`Error: Could not find ${mainJsPath}`);

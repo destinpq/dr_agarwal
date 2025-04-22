@@ -1,0 +1,18 @@
+name: workshop-frontend
+services:
+  - name: web
+    build_command: npm run build
+    run_command: npm start
+    http_port: 8080
+    environment_slug: node-js
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: BACKEND_URL
+        value: ${BACKEND_URL}
+      - key: NEXT_PUBLIC_BACKEND_URL
+        value: ${NEXT_PUBLIC_BACKEND_URL}
+      - key: NEXT_PUBLIC_SITE_URL
+        value: ${NEXT_PUBLIC_SITE_URL}
+    instance_count: 1
+    instance_size_slug: basic-xxs 

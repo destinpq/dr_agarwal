@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+.next
+out
+yarn.lock
+yarn-error.log
+yarn-debug.log
+.env
+.env.*
+!.env.example 

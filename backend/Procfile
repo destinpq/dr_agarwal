@@ -1,1 +1,1 @@
-web: npm install -g typescript && tsc -p health-tsconfig.json && node health.js 
+web: node server.js 

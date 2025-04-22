@@ -5,17 +5,17 @@
   "main": "dist/main.js",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc -p tsconfig.json",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "node dist/main.js",
+    "start": "node server.js",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main.js",
     "lint": "eslint \"{src,apps,libs}/**/*.ts\"",
-    "health-check": "curl -v http://localhost:8080 || curl -v http://localhost:8080/health"
+    "health": "curl -v localhost:8080/health || echo 'Health check failed'"
   },
   "engines": {
-    "node": "20.x"
+    "node": "20.18.3"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

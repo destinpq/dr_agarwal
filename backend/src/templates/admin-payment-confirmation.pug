@@ -1,0 +1,107 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    title Payment Received - Workshop Registration
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #f0e6ff;
+        padding: 20px;
+        text-align: center;
+        border-radius: 5px 5px 0 0;
+      }
+      .content {
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #ddd;
+      }
+      .footer {
+        background-color: #f5f5f5;
+        padding: 15px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+        border-radius: 0 0 5px 5px;
+      }
+      h1 {
+        color: #52c41a;
+        margin: 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      table, th, td {
+        border: 1px solid #ddd;
+      }
+      th {
+        background-color: #f0e6ff;
+        padding: 10px;
+        text-align: left;
+      }
+      td {
+        padding: 10px;
+      }
+      .highlight {
+        background-color: #f6ffed;
+        border-left: 4px solid #52c41a;
+        padding: 15px;
+        margin: 20px 0;
+      }
+      .screenshot-button {
+        display: inline-block;
+        background-color: #722ed1;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-top: 15px;
+      }
+  body
+    div.container
+      div.header
+        h1 Payment Received
+      div.content
+        div.highlight
+          p A payment has been received for a workshop registration.
+        
+        table
+          tr
+            th Registration ID
+            td= registration.id
+          tr
+            th Name
+            td= registration.name
+          tr
+            th Email
+            td= registration.email
+          tr
+            th Phone
+            td= registration.phone
+          tr
+            th Payment Status
+            td Completed
+          tr
+            th Payment Date
+            td= registration.updatedAt
+        
+        p The payment screenshot can be viewed at the link below:
+        
+        p
+          a.screenshot-button(href=`${backendUrl}/registrations/${registration.id}/screenshot`) View Payment Screenshot
+        
+        p You can view and manage all registrations in the admin dashboard.
+      div.footer
+        p This is an automated notification from Dr. Agarwal's Workshop Registration System. 

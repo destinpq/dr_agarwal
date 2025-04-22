@@ -28,7 +28,11 @@ const nextConfig = {
   
   // Add API rewrites for backend communication
   async rewrites() {
-    const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:31678';
+    const BACKEND_URL = process.env.BACKEND_URL;
+    if (!BACKEND_URL) {
+      console.error('BACKEND_URL environment variable is not set!');
+      throw new Error('BACKEND_URL must be configured in environment variables');
+    }
     console.log('Using Backend URL:', BACKEND_URL);
     return [
       {

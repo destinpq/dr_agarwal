@@ -208,7 +208,12 @@ Dr. Agarwal's Psychology Workshop Team`;
     const isDev = this.configService.get('NODE_ENV') === 'development';
     const adminEmail = this.configService.get('ADMIN_EMAIL');
     const userEmail = registration.email;
-    const backendUrl = this.configService.get('BACKEND_URL') || `http://localhost:${this.configService.get('PORT') || 3001}`;
+    
+    // Get backend URL from environment variable without localhost fallback
+    const backendUrl = this.configService.get('BACKEND_URL');
+    if (!backendUrl) {
+      this.logger.warn('BACKEND_URL not configured in environment variables');
+    }
     
     if (isDev && adminEmail === 'admin@example.com') {
       this.logger.warn('Admin email not configured. Skipping admin payment notification.');

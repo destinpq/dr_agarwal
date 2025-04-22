@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable standalone output mode for better deployment compatibility
+  output: 'standalone',
+  
   experimental: {
     serverActions: {
       allowedOrigins: [
@@ -11,18 +14,30 @@ const nextConfig = {
       ]
     }
   },
+  
+  // Ensure Ant Design components are properly transpiled
   transpilePackages: ['antd', '@ant-design', 'rc-util', 'rc-pagination', 'rc-picker'],
+  
+  // Add custom error handling
+  onDemandEntries: {
+    // period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 25 * 1000,
+    // number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 2,
+  },
+  
+  // Add API rewrites for backend communication
   async rewrites() {
-    const API_URL = process.env.API_URL || 'http://localhost:3001';
-    console.log('Using API URL:', API_URL);
+    const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:31678';
+    console.log('Using Backend URL:', BACKEND_URL);
     return [
       {
         source: '/api/registrations/:path*',
-        destination: `${API_URL}/registrations/:path*`,
+        destination: `${BACKEND_URL}/registrations/:path*`,
       },
       {
         source: '/api/registrations',
-        destination: `${API_URL}/registrations`,
+        destination: `${BACKEND_URL}/registrations`,
       }
     ];
   },

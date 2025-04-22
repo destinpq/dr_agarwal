@@ -2,17 +2,19 @@
   "name": "workshop-frontend",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "npm@10.x",
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "next build",
+    "build": "next build --no-lint",
     "start": "node server.js",
     "start:dev": "next dev -p 3001",
     "start:standalone": "node .next/standalone/server.js",
-    "lint": "next lint"
+    "lint": "next lint",
+    "preinstall": "echo 'WARNING: DO NOT USE YARN - use npm install instead!' && exit 0"
   },
   "engines": {
-    "node": "20.x",
-    "npm": "10.x"
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.18.4",

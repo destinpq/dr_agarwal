@@ -56,6 +56,7 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showPaymentUpload, setShowPaymentUpload] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { 
     control, 
@@ -75,7 +76,13 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   };
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    if (isSubmitting) {
+      console.log('Preventing duplicate submission');
+      return;
+    }
+    
     setIsLoading(true);
+    setIsSubmitting(true);
     
     try {
       // Validate all required fields are present
@@ -140,7 +147,12 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       
       // Add payment screenshot if available
       if (showPaymentUpload && data.paymentScreenshot && data.paymentScreenshot.length > 0) {
-        formData.append('paymentScreenshot', data.paymentScreenshot[0] as unknown as File);
+        const screenshot = data.paymentScreenshot[0];
+        console.log('Adding payment screenshot to form data:', screenshot.name, screenshot.type, screenshot.size);
+        
+        // Make sure we're getting the actual File object from the FileList
+        const file = data.paymentScreenshot[0] as unknown as File;
+        formData.append('paymentScreenshot', file, file.name);
       }
       
       // Debug log the form data being sent
@@ -158,19 +170,13 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
 
       // Determine if we're running on goldfish-app
       const isGoldfishApp = window.location.hostname.includes('goldfish-app');
-      // Try both with and without the /api prefix
+      // Use a local development URL with /api prefix as default
       let apiEndpoint = '/api/registrations';
       
       if (isGoldfishApp) {
-        // First, try direct with /api prefix
-        const withApiPrefix = 'https://plankton-app-jrxs6.ondigitalocean.app/api/registrations';
-        // Also try without the /api prefix as a fallback
-        const withoutApiPrefix = 'https://plankton-app-jrxs6.ondigitalocean.app/registrations';
-        
-        // Use the one with /api prefix first
-        apiEndpoint = withApiPrefix;
-        console.log('Using initial API endpoint:', apiEndpoint);
-        console.log('Will fallback to:', withoutApiPrefix, 'if first attempt fails');
+        // Use localhost URL for local development
+        apiEndpoint = 'http://localhost:8080/api/registrations';
+        console.log('Using API endpoint:', apiEndpoint);
       }
       
       if (!showPaymentUpload) {
@@ -178,34 +184,24 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         console.log('Submitting registration - Step 1: Initial registration');
         
         try {
+          // Added timeout to prevent hanging requests
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+          
           response = await fetch(apiEndpoint, {
             method: 'POST',
             body: formData,
-            headers: isGoldfishApp ? {
-              'Origin': 'https://goldfish-app-sibhj.ondigitalocean.app'
-            } : undefined,
-            credentials: isGoldfishApp ? 'omit' : 'same-origin',
-            mode: isGoldfishApp ? 'cors' : 'same-origin'
+            signal: controller.signal,
+            credentials: 'same-origin'
           });
           
-          // If using API endpoint failed and we're on goldfish, try without the /api prefix
-          if (!response.ok && isGoldfishApp && apiEndpoint.includes('/api/')) {
-            console.log('First attempt failed, trying without /api prefix');
-            apiEndpoint = 'https://plankton-app-jrxs6.ondigitalocean.app/registrations';
-            
-            // Try again with the alternative endpoint
-            response = await fetch(apiEndpoint, {
-              method: 'POST',
-              body: formData,
-              headers: {
-                'Origin': 'https://goldfish-app-sibhj.ondigitalocean.app'
-              },
-              credentials: 'omit',
-              mode: 'cors'
-            });
-          }
-        } catch (fetchError) {
+          clearTimeout(timeoutId);
+          
+        } catch (fetchError: unknown) {
           console.error('Fetch error:', fetchError);
+          if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+            throw new Error('Request timed out. Please try again later.');
+          }
           throw new Error('Network error: ' + ((fetchError as Error)?.message || 'Failed to connect to server'));
         }
       } else {
@@ -228,40 +224,19 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        let updateEndpoint = isGoldfishApp 
-          ? `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${registrationId}`
-          : `/api/registrations/${registrationId}`;
-          
+        // Use the new dedicated update endpoint instead of the dynamic route
+        const updateEndpoint = `/api/update-registration`;
+        
         console.log('Using update endpoint:', updateEndpoint);
         
         try {
           response = await fetch(updateEndpoint, {
-            method: 'PATCH',
+            method: 'POST', // Changed to POST since the new endpoint uses POST
             body: formData,
-            headers: isGoldfishApp ? {
-              'Origin': 'https://goldfish-app-sibhj.ondigitalocean.app'
-            } : undefined,
-            credentials: isGoldfishApp ? 'omit' : 'same-origin',
-            mode: isGoldfishApp ? 'cors' : 'same-origin'
+            credentials: 'same-origin'
           });
           
-          // If using API endpoint failed and we're on goldfish, try without the /api prefix
-          if (!response.ok && isGoldfishApp && updateEndpoint.includes('/api/')) {
-            console.log('First attempt failed, trying without /api prefix for update');
-            updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/registrations/${registrationId}`;
-            
-            // Try again with the alternative endpoint
-            response = await fetch(updateEndpoint, {
-              method: 'PATCH',
-              body: formData,
-              headers: {
-                'Origin': 'https://goldfish-app-sibhj.ondigitalocean.app'
-              },
-              credentials: 'omit',
-              mode: 'cors'
-            });
-          }
-        } catch (fetchError) {
+        } catch (fetchError: unknown) {
           console.error('Fetch error:', fetchError);
           throw new Error('Network error: ' + ((fetchError as Error)?.message || 'Failed to connect to server'));
         }
@@ -345,6 +320,14 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           duration: 5
         });
         
+        // Add additional confirmation message
+        notification.info({
+          message: 'Confirmation',
+          description: `Your registration (ID: ${responseData.id}) has been received. An email confirmation with WhatsApp access details will be sent to ${data.email}.`,
+          placement: 'topRight',
+          duration: 10
+        });
+        
         // Clear local storage
         localStorage.removeItem('registrationId');
         
@@ -365,6 +348,8 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         placement: 'topRight',
         duration: 5
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

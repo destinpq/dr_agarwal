@@ -3,17 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // Get environment variables or fallback to local development
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
 
-// Define correct types for the PATCH method
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
-
 // API endpoint for updating a registration by ID
 export async function PATCH(
   req: NextRequest,
-  { params }: RouteParams
+  context: { params: { id: string } }
 ) {
   try {
     // Check if backend URL is configured
@@ -25,7 +18,7 @@ export async function PATCH(
     }
     
     const formData = await req.formData();
-    const id = params.id;
+    const id = context.params.id;
     
     if (!id) {
       return NextResponse.json(

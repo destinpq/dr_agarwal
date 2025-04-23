@@ -209,14 +209,46 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        // Use PUT method directly to the registration ID endpoint
-        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations`;
+        // Use backend's PATCH endpoint directly instead of through our Next.js API route
+        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${registrationId}`;
         
         console.log('Using update endpoint:', updateEndpoint);
         
+        // Convert image to base64 if available
+        if (showPaymentUpload && data.paymentScreenshot && data.paymentScreenshot.length > 0) {
+          try {
+            const file = data.paymentScreenshot[0] as unknown as File;
+            const fileReader = new FileReader();
+            
+            // Create a promise to handle the FileReader async operation
+            const base64Promise = new Promise<string>((resolve, reject) => {
+              fileReader.onload = () => {
+                // Get the base64 string (remove the data:image/xxx;base64, prefix)
+                const base64 = String(fileReader.result).split(',')[1];
+                resolve(base64);
+              };
+              fileReader.onerror = () => reject(new Error('Failed to read file'));
+              fileReader.readAsDataURL(file);
+            });
+            
+            // Wait for the file to be converted to base64
+            const base64Data = await base64Promise;
+            
+            // Replace the file with base64 data in the form
+            formData.delete('paymentScreenshot');
+            formData.append('paymentScreenshot', base64Data);
+            formData.append('fileName', file.name);
+            formData.append('fileType', file.type);
+            
+            console.log('Converted payment screenshot to base64 format');
+          } catch (error) {
+            console.error('Error converting file to base64:', error);
+          }
+        }
+        
         try {
           response = await fetch(updateEndpoint, {
-            method: 'POST',
+            method: 'POST', // Use POST for updates as requested
             body: formData,
             credentials: 'same-origin'
           });

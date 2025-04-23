@@ -90,10 +90,26 @@ export class RegistrationService {
     await this.registrationRepository.remove(registration);
   }
 
+  private getWorkshopTimingDescription(timing: string): string {
+    switch (timing) {
+      case 'morning':
+        return '10 AM - 12 PM';
+      case 'afternoon':
+        return '4 PM - 6 PM';
+      case 'evening':
+        return '5 PM - 7 PM';
+      default:
+        return timing;
+    }
+  }
+
   private async sendRegistrationEmails(registration: Registration): Promise<void> {
     const isDev = this.configService.get('NODE_ENV') === 'development';
     const adminEmail = this.configService.get('ADMIN_EMAIL');
     const userEmail = registration.email;
+    
+    // Format the timing for display
+    const timingDescription = this.getWorkshopTimingDescription(registration.preferredTiming);
     
     if (isDev && adminEmail === 'admin@example.com') {
       this.logger.warn('Admin email not configured. Skipping admin notification.');
@@ -114,8 +130,7 @@ export class RegistrationService {
         - Phone: ${registration.phone}
         - Age: ${registration.age}
         - Interest Area: ${registration.interestArea}
-        - Preferred Dates: ${registration.preferredDates}
-        - Preferred Timing: ${registration.preferredTiming}
+        - Preferred Timing: ${timingDescription}
         - Expectations: ${registration.expectations || 'None provided'}
         - Referral Source: ${registration.referralSource}
         - Payment Status: ${registration.paymentStatus}
@@ -140,7 +155,7 @@ export class RegistrationService {
         
         Workshop Details:
         - Dates: 5th May - 30th May
-        - Timing: ${registration.preferredTiming}
+        - Timing: ${timingDescription}
         - Payment Status: ${registration.paymentStatus === PaymentStatus.COMPLETED ? 'Completed' : 'Pending'}
         
         ${registration.paymentStatus !== PaymentStatus.COMPLETED 
@@ -168,7 +183,7 @@ Dear ${registration.name},
 
 Your registration details:
 📅 Workshop dates: 5th May - 30th May
-⏰ Workshop timing: ${registration.preferredTiming}
+⏰ Workshop timing: ${timingDescription}
 💰 Payment status: ${registration.paymentStatus === PaymentStatus.COMPLETED ? 'Confirmed ✅' : 'Pending ⏳'}
 
 ${registration.paymentStatus !== PaymentStatus.COMPLETED ? '⚠️ Please complete your payment to confirm your spot in the workshop.' : ''}
@@ -208,6 +223,9 @@ Dr. Agarwal's Psychology Workshop Team`;
     const adminEmail = this.configService.get('ADMIN_EMAIL');
     const userEmail = registration.email;
     
+    // Format the timing for display
+    const timingDescription = this.getWorkshopTimingDescription(registration.preferredTiming);
+    
     // Get backend URL from environment variable without localhost fallback
     const backendUrl = this.configService.get('BACKEND_URL');
     if (!backendUrl) {
@@ -231,6 +249,7 @@ Dr. Agarwal's Psychology Workshop Team`;
         - Name: ${registration.name}
         - Email: ${registration.email}
         - Phone: ${registration.phone}
+        - Preferred Timing: ${timingDescription}
         - Payment Status: Completed
         
         You can view the payment screenshot and registration details in the admin dashboard.`
@@ -257,7 +276,7 @@ Dr. Agarwal's Psychology Workshop Team`;
         
         Workshop Details:
         - Dates: 5th May - 30th May
-        - Timing: ${registration.preferredTiming}
+        - Timing: ${timingDescription}
         
         We will send you a reminder email with the workshop materials and joining instructions a few days before the event.
         
@@ -284,7 +303,7 @@ Your payment for the Psychology Workshop has been successfully processed.
 
 *Workshop Details:*
 📅 Dates: 5th May - 30th May
-⏰ Timing: ${registration.preferredTiming}
+⏰ Timing: ${timingDescription}
 
 We'll send you the Zoom meeting link and preparation materials 3 days before the workshop.
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { 
   Form, Input, Button, Select, 
-  Upload, DatePicker, Typography, Radio, 
+  Upload, Typography, Radio, 
   Space, notification, Steps
 } from 'antd';
 import { 
@@ -13,7 +13,6 @@ import {
   BulbOutlined, InfoCircleOutlined, CalendarOutlined,
   NumberOutlined, CheckCircleOutlined, PhoneOutlined
 } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import PaymentButton from './PaymentButton';
 
 const { Title, Paragraph } = Typography;
@@ -25,7 +24,6 @@ interface IFormInput {
   email: string;
   age: number;
   interestArea: string;
-  preferredDates: [dayjs.Dayjs, dayjs.Dayjs];
   preferredTiming: string;
   expectations: string;
   paymentScreenshot: FileList;
@@ -92,7 +90,6 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         { field: 'phone', label: 'Phone Number' },
         { field: 'age', label: 'Age' },
         { field: 'interestArea', label: 'Area of Interest' },
-        { field: 'preferredDates', label: 'Available Dates' },
         { field: 'preferredTiming', label: 'Preferred Timing' },
         { field: 'referralSource', label: 'Referral Source' }
       ];
@@ -126,15 +123,9 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       formData.append('age', data.age.toString());
       formData.append('interestArea', data.interestArea);
       
-      // Format dates
-      if (data.preferredDates) {
-        const startDate = data.preferredDates[0].format('YYYY-MM-DD');
-        const endDate = data.preferredDates[1].format('YYYY-MM-DD');
-        
-        // Backend expects an array of exactly 2 dates
-        formData.append('preferredDates[]', startDate);
-        formData.append('preferredDates[]', endDate);
-      }
+      // Use fixed dates for the workshop
+      formData.append('preferredDates[]', '2025-05-05');
+      formData.append('preferredDates[]', '2025-05-30');
       
       formData.append('preferredTiming', data.preferredTiming);
       
@@ -689,52 +680,6 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 label={
                   <div className="form-label">
                     <span className="required-dot">*</span>
-                    <span className="label-text">Available Dates</span>
-                  </div>
-                }
-              >
-                <Controller
-                  name="preferredDates"
-                  control={control}
-                  rules={{ 
-                    required: "Please select your available dates",
-                    validate: value => {
-                      if (!value || !value[0] || !value[1]) {
-                        return "Both start and end dates are required";
-                      }
-                      if (value[0].isAfter(value[1])) {
-                        return "Start date must be before end date";
-                      }
-                      if (value[0].isBefore(dayjs().startOf('day'))) {
-                        return "Start date cannot be in the past";
-                      }
-                      if (value[1].isAfter(dayjs().add(90, 'day'))) {
-                        return "End date must be within the next 90 days";
-                      }
-                      return true;
-                    }
-                  }}
-                  render={({ field }) => (
-                    <DatePicker.RangePicker 
-                      {...field}
-                      size="large"
-                      format="YYYY-MM-DD"
-                      placeholder={['Start date', 'End date']}
-                      className="styled-date-picker"
-                      disabledDate={(current) => {
-                        return current && current < dayjs().endOf('day');
-                      }}
-                      status={errors.preferredDates ? "error" : ""}
-                    />
-                  )}
-                />
-                {errors.preferredDates && <div className="ant-form-item-explain-error">{errors.preferredDates.message}</div>}
-              </Form.Item>
-
-              <Form.Item 
-                label={
-                  <div className="form-label">
-                    <span className="required-dot">*</span>
                     <span className="label-text">Preferred Timing for Sessions</span>
                   </div>
                 }
@@ -745,22 +690,26 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                   rules={{ 
                     required: "Please select your preferred timing",
                     validate: value => {
-                      const validTimes = ["morning", "afternoon", "evening", "night"];
+                      const validTimes = ["morning", "afternoon", "evening"];
                       return validTimes.includes(value) || "Please select a valid time slot";
                     }
                   }}
                   render={({ field }) => (
-                    <Radio.Group 
-                      {...field}
-                      className="styled-radio-group"
-                    >
-                      <Space direction="vertical" style={{ width: '100%' }}>
-                        <Radio value="morning" className="styled-radio">Morning (9 AM - 12 PM)</Radio>
-                        <Radio value="afternoon" className="styled-radio">Afternoon (12 PM - 4 PM)</Radio>
-                        <Radio value="evening" className="styled-radio">Evening (4 PM - 7 PM)</Radio>
-                        <Radio value="night" className="styled-radio">Night (7 PM - 10 PM)</Radio>
-                      </Space>
-                    </Radio.Group>
+                    <div>
+                      <Paragraph style={{ marginBottom: '1rem', color: '#722ed1', fontWeight: 'bold' }}>
+                        Workshop Dates: 5th May to 30th May
+                      </Paragraph>
+                      <Radio.Group 
+                        {...field}
+                        className="styled-radio-group"
+                      >
+                        <Space direction="vertical" style={{ width: '100%' }}>
+                          <Radio value="morning" className="styled-radio">Morning (10 AM - 12 PM)</Radio>
+                          <Radio value="afternoon" className="styled-radio">Afternoon (4 PM - 6 PM)</Radio>
+                          <Radio value="evening" className="styled-radio">Evening (5 PM - 7 PM)</Radio>
+                        </Space>
+                      </Radio.Group>
+                    </div>
                   )}
                 />
                 {errors.preferredTiming && <div className="ant-form-item-explain-error">{errors.preferredTiming.message}</div>}

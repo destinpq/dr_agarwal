@@ -50,7 +50,7 @@ export default function PaymentButton({ onInstruct }: PaymentButtonProps) {
   
   const openUpiApp = () => {
     // Create a UPI deep link
-    const upiLink = 'upi://pay?pa=khanapurkarpratik@okicici&pn=Pratik%20K&am=2500';
+    const upiLink = 'upi://pay?pa=drakankshaagarwal@sbi&pn=Akanksha%20Agarwal&am=5000';
     
     // Open the UPI link
     window.location.href = upiLink;

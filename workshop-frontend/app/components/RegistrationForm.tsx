@@ -227,8 +227,8 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        // Use backend's collection endpoint directly with POST for updates
-        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations`;
+        // Use the dedicated update-registration endpoint that handles POST properly
+        const updateEndpoint = '/api/update-registration';
         
         console.log('Using update endpoint:', updateEndpoint);
         
@@ -273,6 +273,8 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
               }
             };
             
+            // Force the full URL to ensure no environment variable confusion
+            console.log('Opening XHR with endpoint:', window.location.origin + updateEndpoint);
             xhr.open('POST', updateEndpoint);
             xhr.withCredentials = true;
             

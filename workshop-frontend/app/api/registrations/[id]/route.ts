@@ -38,7 +38,8 @@ export async function PATCH(
     }
 
     console.log(`Processing update for registration ID: ${id}`);
-    console.log(`Updating registration at: ${backendUrl}/registrations/${id}`);
+    const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${id}`;
+    console.log(`Updating registration at: ${updateEndpoint}`);
 
     // Log the formData contents for debugging
     console.log('Updating with formData contents:');
@@ -52,7 +53,7 @@ export async function PATCH(
     }
 
     try {
-      const response = await fetch(`${backendUrl}/registrations/${id}`, {
+      const response = await fetch(updateEndpoint, {
         method: 'PATCH',
         body: formData,
       });

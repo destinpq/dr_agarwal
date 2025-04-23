@@ -103,6 +103,41 @@ export class RegistrationController {
     return this.registrationService.remove(id);
   }
 
+  @Post(':id')
+  @UseInterceptors(FileInterceptor('paymentScreenshot'))
+  async updateViaPost(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateRegistrationDto: UpdateRegistrationDto,
+    @UploadedFile() paymentScreenshot?: Express.Multer.File,
+  ): Promise<Registration> {
+    this.logger.log(`Updating registration ${id} via POST: ${JSON.stringify(updateRegistrationDto)}`);
+    
+    try {
+      // Handle file safely
+      let fileBuffer: Buffer | undefined = undefined;
+      
+      if (paymentScreenshot && paymentScreenshot.buffer) {
+        try {
+          // Make sure we have a valid buffer
+          if (Buffer.isBuffer(paymentScreenshot.buffer)) {
+            fileBuffer = paymentScreenshot.buffer;
+            this.logger.log(`Payment screenshot received with size: ${fileBuffer.length} bytes`);
+          } else {
+            this.logger.warn(`Payment screenshot buffer is not a valid Buffer object`);
+          }
+        } catch (fileError) {
+          this.logger.error(`Error processing payment screenshot: ${fileError.message}`);
+          // Continue without the file if there's an error
+        }
+      }
+      
+      return this.registrationService.update(id, updateRegistrationDto, fileBuffer);
+    } catch (error) {
+      this.logger.error(`Error updating registration via POST: ${error.message}`);
+      throw error;
+    }
+  }
+
   @Get(':id/screenshot')
   async getPaymentScreenshot(
     @Param('id', ParseUUIDPipe) id: string,

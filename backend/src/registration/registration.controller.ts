@@ -103,6 +103,56 @@ export class RegistrationController {
     return this.registrationService.remove(id);
   }
 
+  // Dedicated endpoint for frontend update-registration path
+  @Post('/update-registration')
+  @UseInterceptors(FileInterceptor('paymentScreenshot', {
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB limit
+    },
+    // Force proper multer setup
+    storage: undefined // Use memory storage for direct buffer access
+  }))
+  async updateRegistrationWithPayment(
+    @Body() updateData: any,
+    @UploadedFile() paymentScreenshot?: Express.Multer.File,
+  ): Promise<Registration> {
+    const id = updateData.id;
+    if (!id) {
+      throw new BadRequestException('Registration ID is required in the request body');
+    }
+    
+    this.logger.log(`Updating registration ${id} via update-registration endpoint`);
+    
+    try {
+      // Handle file safely
+      let fileBuffer: Buffer | undefined = undefined;
+      
+      if (paymentScreenshot && paymentScreenshot.buffer) {
+        try {
+          // Make sure we have a valid buffer
+          if (Buffer.isBuffer(paymentScreenshot.buffer)) {
+            fileBuffer = paymentScreenshot.buffer;
+            this.logger.log(`Payment screenshot received with size: ${fileBuffer.length} bytes`);
+          } else {
+            this.logger.warn(`Payment screenshot buffer is not a valid Buffer object`);
+          }
+        } catch (fileError) {
+          this.logger.error(`Error processing payment screenshot: ${fileError.message}`);
+          // Continue without the file if there's an error
+        }
+      }
+      
+      const updateDto = new UpdateRegistrationDto();
+      // Copy allowed fields from updateData to updateDto
+      if (updateData.paymentStatus) updateDto.paymentStatus = updateData.paymentStatus;
+      
+      return this.registrationService.update(id, updateDto, fileBuffer);
+    } catch (error) {
+      this.logger.error(`Error updating registration: ${error.message}`);
+      throw error;
+    }
+  }
+
   @Post(':id')
   @UseInterceptors(FileInterceptor('paymentScreenshot'))
   async updateViaPost(

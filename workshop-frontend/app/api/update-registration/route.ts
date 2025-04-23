@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 // import { sendEmail } from '@/utils/email'; // Ensure this path is correct -> Removed unused import
 
-// Hard redirect to the real backend URL
+// Hardcoded backend URL
+const backendUrl = 'https://plankton-app-jrxs6.ondigitalocean.app/api';
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -14,49 +16,54 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Redirect to the correct backend URL
-    const redirectUrl = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${id}`;
-    console.log(`Redirecting to correct backend URL: ${redirectUrl}`);
+    console.log(`Processing registration update for ID: ${id}`);
     
-    // Create a new FormData with special handling for the file
-    const paymentFormData = new FormData();
+    // Use the dedicated update endpoint in the backend
+    const updateEndpoint = `${backendUrl.replace(/\/api$/, '')}/api/registrations/update-registration`;
+    console.log(`Forwarding to backend at: ${updateEndpoint}`);
     
-    // Explicitly handle the payment screenshot file
-    if (formData.has('paymentScreenshot')) {
-      const screenshot = formData.get('paymentScreenshot');
-      if (screenshot instanceof File) {
-        console.log(`Adding payment screenshot: ${screenshot.name}, ${screenshot.type}, ${screenshot.size} bytes`);
-        paymentFormData.append('paymentScreenshot', screenshot, screenshot.name);
+    try {
+      const response = await fetch(updateEndpoint, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          return NextResponse.json(
+            { error: errorData.message || errorData.error || 'Failed to update registration' },
+            { status: response.status }
+          );
+        } else {
+          const text = await response.text();
+          console.error('Non-JSON error response:', text);
+          return NextResponse.json(
+            { error: `Update failed: ${response.statusText}` },
+            { status: response.status }
+          );
+        }
       }
+      
+      const data = await response.json();
+      console.log('Update successful, received data:', data);
+      return NextResponse.json({
+        ...data,
+        message: 'Your payment has been confirmed. A confirmation email has been sent to your registered email address.'
+      });
+      
+    } catch (fetchError) {
+      console.error('Connection error:', fetchError);
+      return NextResponse.json(
+        { error: 'Failed to connect to the backend server' },
+        { status: 503 }
+      );
     }
-    
-    // Add paymentStatus
-    paymentFormData.append('paymentStatus', 'completed');
-    
-    // Log what we're sending
-    console.log('Forwarding with payment data:');
-    for (const [key, value] of paymentFormData.entries()) {
-      if (value instanceof File) {
-        console.log(`${key}: File (${value.name}, ${value.type}, ${value.size} bytes)`);
-      } else {
-        console.log(`${key}: ${value}`);
-      }
-    }
-    
-    // Forward the request to the actual backend
-    const response = await fetch(redirectUrl, {
-      method: 'POST',
-      body: paymentFormData
-    });
-    
-    // Return the backend's response directly
-    const responseData = await response.json();
-    return NextResponse.json(responseData, { status: response.status });
-    
   } catch (error) {
-    console.error('Error in update-registration redirect route:', error);
+    console.error('Update registration error:', error);
     return NextResponse.json(
-      { error: 'An error occurred forwarding your request to the backend' },
+      { error: 'An error occurred while updating registration' },
       { status: 500 }
     );
   }

@@ -209,8 +209,8 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        // Always use absolute URL to backend directly
-        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${registrationId}`;
+        // Use the dedicated update-registration endpoint that accepts POST
+        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/update-registration`;
         
         console.log('Using update endpoint:', updateEndpoint);
         

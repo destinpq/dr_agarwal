@@ -218,14 +218,14 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        // Use hardcoded backend URL for update endpoint too
-        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/update-registration`;
+        // Use backend's PATCH endpoint directly instead of through our Next.js API route
+        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${registrationId}`;
         
         console.log('Using update endpoint:', updateEndpoint);
         
         try {
           response = await fetch(updateEndpoint, {
-            method: 'POST', // Changed to POST since the new endpoint uses POST
+            method: 'PATCH', // Use PATCH directly against the backend
             body: formData,
             credentials: 'same-origin'
           });

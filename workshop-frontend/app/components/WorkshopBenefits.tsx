@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card, Typography, Divider } from 'antd';
-import { StarOutlined, TeamOutlined, TrophyOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { StarOutlined, ThunderboltOutlined, MedicineBoxOutlined, ExperimentOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 
 const { Title } = Typography;
@@ -10,18 +10,18 @@ const { Title } = Typography;
 const benefits = [
   {
     icon: <StarOutlined style={{ fontSize: 30, color: '#722ed1' }} />,
-    title: 'Expert-led Sessions',
-    description: 'Learn from industry-leading psychologists with years of experience in various psychological domains.'
+    title: 'Practical Psychology Skills',
+    description: 'Learn practical psychology skills that you can apply in both professional and personal contexts.'
   },
   {
-    icon: <TeamOutlined style={{ fontSize: 30, color: '#722ed1' }} />,
-    title: 'Networking',
-    description: 'Connect with like-minded individuals in the field of psychology and expand your professional network.'
+    icon: <MedicineBoxOutlined style={{ fontSize: 30, color: '#722ed1' }} />,
+    title: 'Enhanced Pathology Understanding',
+    description: 'Gain deeper insights and understanding of psychological pathology through expert-led instruction.'
   },
   {
-    icon: <TrophyOutlined style={{ fontSize: 30, color: '#722ed1' }} />,
-    title: 'Practical Skills',
-    description: 'Develop practical skills and techniques that you can apply in real-world situations immediately.'
+    icon: <ExperimentOutlined style={{ fontSize: 30, color: '#722ed1' }} />,
+    title: 'Therapy Exploration',
+    description: 'Get a sneak-peak into the world of Therapy with hands-on exercises and practical demonstrations.'
   },
   {
     icon: <ThunderboltOutlined style={{ fontSize: 30, color: '#722ed1' }} />,
@@ -29,6 +29,13 @@ const benefits = [
     description: 'Engage in interactive activities, discussions, and case studies for a comprehensive learning experience.'
   }
 ];
+
+// Workshop dates - update these as needed
+export const workshopDates = {
+  start: "5th May",
+  end: "30th May",
+  formatted: "5th May - 30th May"
+};
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -58,7 +65,7 @@ const WorkshopBenefits = () => {
     }}>
       <Title level={2} style={{ 
         textAlign: 'center', 
-        marginBottom: '2rem',
+        marginBottom: '0.5rem',
         position: 'relative',
         display: 'inline-block',
         left: '50%',
@@ -75,6 +82,16 @@ const WorkshopBenefits = () => {
           borderRadius: '3px'
         }}></div>
       </Title>
+      
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '2rem',
+        color: '#722ed1',
+        fontWeight: 'bold',
+        fontSize: '1.2rem'
+      }}>
+        Workshop Dates: {workshopDates.formatted}
+      </div>
 
       <motion.div 
         className="workshop-benefits-grid"

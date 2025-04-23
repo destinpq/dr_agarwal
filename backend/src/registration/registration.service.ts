@@ -139,7 +139,7 @@ export class RegistrationService {
         Thank you for registering for Dr. Agarwal's Psychology Workshop. We're excited to have you join us!
         
         Workshop Details:
-        - Dates: ${registration.preferredDates.join(' - ')}
+        - Dates: 5th May - 30th May
         - Timing: ${registration.preferredTiming}
         - Payment Status: ${registration.paymentStatus === PaymentStatus.COMPLETED ? 'Completed' : 'Pending'}
         
@@ -167,7 +167,7 @@ export class RegistrationService {
 Dear ${registration.name},
 
 Your registration details:
-📅 Workshop dates: ${registration.preferredDates.join(' - ')}
+📅 Workshop dates: 5th May - 30th May
 ⏰ Workshop timing: ${registration.preferredTiming}
 💰 Payment status: ${registration.paymentStatus === PaymentStatus.COMPLETED ? 'Confirmed ✅' : 'Pending ⏳'}
 
@@ -175,9 +175,8 @@ ${registration.paymentStatus !== PaymentStatus.COMPLETED ? '⚠️ Please comple
 
 *Workshop Benefits:*
 • Learn practical psychology skills
-• Enhance your emotional intelligence
-• Develop better relationships
-• Manage stress effectively
+• Enhanced understanding of Pathology
+• A sneak-peak into the world of Therapy
 
 For any queries, please reply to this message or contact us at our office.
 
@@ -257,7 +256,7 @@ Dr. Agarwal's Psychology Workshop Team`;
         We're pleased to confirm that your payment for the Psychology Workshop has been successfully processed. Your spot is now fully secured!
         
         Workshop Details:
-        - Dates: ${registration.preferredDates.join(' - ')}
+        - Dates: 5th May - 30th May
         - Timing: ${registration.preferredTiming}
         
         We will send you a reminder email with the workshop materials and joining instructions a few days before the event.
@@ -284,15 +283,15 @@ Dear ${registration.name},
 Your payment for the Psychology Workshop has been successfully processed.
 
 *Workshop Details:*
-📅 Dates: ${registration.preferredDates.join(' - ')}
+📅 Dates: 5th May - 30th May
 ⏰ Timing: ${registration.preferredTiming}
 
 We'll send you the Zoom meeting link and preparation materials 3 days before the workshop.
 
 *What to expect:*
-• Pre-workshop reading materials
-• Interactive sessions
-• Practical exercises
+• Learn practical psychology skills
+• Enhanced understanding of Pathology  
+• A sneak-peak into the world of Therapy
 • Certificate of completion
 
 Please keep this confirmation handy for your reference.

@@ -225,7 +225,7 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         
         try {
           response = await fetch(updateEndpoint, {
-            method: 'PATCH',
+            method: 'POST',
             body: formData,
             credentials: 'same-origin'
           });

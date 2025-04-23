@@ -152,7 +152,7 @@ export default function PaymentButton({ onInstruct }: PaymentButtonProps) {
             }}
             icon={<MobileOutlined />}
           >
-            Pay via UPI App (₹2,500)
+            Pay via UPI App (₹5,000)
           </Button>
           
           <Divider style={{ margin: '15px 0' }} />
@@ -160,7 +160,7 @@ export default function PaymentButton({ onInstruct }: PaymentButtonProps) {
           <div style={{ textAlign: 'left' }}>
             <Title level={5} style={{ marginBottom: '10px' }}>Instructions:</Title>
             <ul style={{ paddingLeft: '20px', marginBottom: '15px' }}>
-              <li>Payment amount: ₹2,500</li>
+              <li>Payment amount: ₹5,000</li>
               <li>After payment, click &quot;I&apos;ve Made the Payment&quot;</li>
               <li>You&apos;ll be prompted to upload a screenshot as proof</li>
               <li>Your registration will be confirmed after verification</li>

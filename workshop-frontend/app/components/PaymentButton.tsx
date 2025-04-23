@@ -39,7 +39,7 @@ export default function PaymentButton({ onInstruct }: PaymentButtonProps) {
   };
   
   const copyUpiId = () => {
-    navigator.clipboard.writeText('khanapurkarpratik@okicici');
+    navigator.clipboard.writeText('drakankshaagarwal@sbi');
     notification.success({
       message: 'UPI ID Copied',
       description: 'UPI ID has been copied to clipboard',
@@ -131,7 +131,7 @@ export default function PaymentButton({ onInstruct }: PaymentButtonProps) {
             borderRadius: '8px',
             border: '1px solid #eee'
           }}>
-            <Text style={{ marginRight: '10px' }} strong>UPI ID: khanapurkarpratik@okicici</Text>
+            <Text style={{ marginRight: '10px' }} strong>UPI ID: drakankshaagarwal@sbi</Text>
             <Tooltip title="Copy UPI ID">
               <Button 
                 icon={<CopyOutlined />} 

@@ -209,8 +209,8 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        // Use the dedicated update-registration endpoint that accepts POST
-        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/update-registration`;
+        // Use PUT method directly to the registration ID endpoint
+        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations`;
         
         console.log('Using update endpoint:', updateEndpoint);
         

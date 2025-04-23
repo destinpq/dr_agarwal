@@ -38,7 +38,7 @@ export async function PATCH(
     }
 
     console.log(`Processing update for registration ID: ${id}`);
-    console.log(`Updating registration at: ${backendUrl}/api/registrations/${id}`);
+    console.log(`Updating registration at: ${backendUrl}/registrations/${id}`);
 
     // Log the formData contents for debugging
     console.log('Updating with formData contents:');
@@ -52,7 +52,7 @@ export async function PATCH(
     }
 
     try {
-      const response = await fetch(`${backendUrl}/api/registrations/${id}`, {
+      const response = await fetch(`${backendUrl}/registrations/${id}`, {
         method: 'PATCH',
         body: formData,
       });

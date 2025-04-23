@@ -218,8 +218,8 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        // Use the new dedicated update endpoint instead of the dynamic route
-        const updateEndpoint = `/api/update-registration`;
+        // Use hardcoded backend URL for update endpoint too
+        const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/update-registration`;
         
         console.log('Using update endpoint:', updateEndpoint);
         

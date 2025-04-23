@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log(`Updating registration at: ${backendUrl}/api/registrations/${id}`);
+    console.log(`Updating registration at: ${backendUrl}/registrations/${id}`);
     
     // Create a new FormData with ONLY payment-related fields
     const paymentFormData = new FormData();
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
     
     try {
-      const response = await fetch(`${backendUrl}/api/registrations/${id}`, {
+      const response = await fetch(`${backendUrl}/registrations/${id}`, {
         method: 'PATCH',
         body: paymentFormData,
       });

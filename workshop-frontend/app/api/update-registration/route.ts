@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     
     // Forward the request to the actual backend
     const response = await fetch(redirectUrl, {
-      method: 'PATCH',
+      method: 'POST',
       body: paymentFormData
     });
     

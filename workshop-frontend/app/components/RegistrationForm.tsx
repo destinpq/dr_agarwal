@@ -209,7 +209,7 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        // Use the collection endpoint for updates - don't append ID to URL path
+        // Use backend's collection endpoint directly with POST for updates
         const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations`;
         
         console.log('Using update endpoint:', updateEndpoint);
@@ -248,7 +248,7 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         
         try {
           response = await fetch(updateEndpoint, {
-            method: 'PUT', // Use PUT for updates at the collection endpoint
+            method: 'POST', // Use POST for updates as specifically requested
             body: formData,
             credentials: 'same-origin'
           });

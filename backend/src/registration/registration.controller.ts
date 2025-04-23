@@ -104,7 +104,7 @@ export class RegistrationController {
   }
 
   // Dedicated endpoint for frontend update-registration path
-  @Post('/update-registration')
+  @Post('update-registration')
   @UseInterceptors(FileInterceptor('paymentScreenshot', {
     limits: {
       fileSize: 5 * 1024 * 1024, // 5MB limit

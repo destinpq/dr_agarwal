@@ -138,12 +138,30 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       
       // Add payment screenshot if available
       if (showPaymentUpload && data.paymentScreenshot && data.paymentScreenshot.length > 0) {
-        const screenshot = data.paymentScreenshot[0];
-        console.log('Adding payment screenshot to form data:', screenshot.name, screenshot.type, screenshot.size);
-        
-        // Make sure we're getting the actual File object from the FileList
+        // Get the file directly from the FileList
         const file = data.paymentScreenshot[0] as unknown as File;
-        formData.append('paymentScreenshot', file, file.name);
+        
+        // Append file with original filename for multipart/form-data
+        try {
+          // Log file details before adding to form
+          console.log('Payment screenshot details:', {
+            name: file.name,
+            type: file.type,
+            size: file.size
+          });
+          
+          // Add file to form data - ensure we're providing the file name
+          formData.append('paymentScreenshot', file, file.name);
+          console.log('Successfully added file to FormData');
+        } catch (fileError) {
+          console.error('Error adding file to FormData:', fileError);
+        }
+        
+        console.log('Added payment screenshot to form data:', {
+          name: file.name,
+          type: file.type,
+          size: file.size
+        });
       }
       
       // Debug log the form data being sent
@@ -214,43 +232,52 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         
         console.log('Using update endpoint:', updateEndpoint);
         
-        // Convert image to base64 if available
-        if (showPaymentUpload && data.paymentScreenshot && data.paymentScreenshot.length > 0) {
-          try {
-            const file = data.paymentScreenshot[0] as unknown as File;
-            const fileReader = new FileReader();
-            
-            // Create a promise to handle the FileReader async operation
-            const base64Promise = new Promise<string>((resolve, reject) => {
-              fileReader.onload = () => {
-                // Get the base64 string (remove the data:image/xxx;base64, prefix)
-                const base64 = String(fileReader.result).split(',')[1];
-                resolve(base64);
-              };
-              fileReader.onerror = () => reject(new Error('Failed to read file'));
-              fileReader.readAsDataURL(file);
-            });
-            
-            // Wait for the file to be converted to base64
-            const base64Data = await base64Promise;
-            
-            // Replace the file with base64 data in the form
-            formData.delete('paymentScreenshot');
-            formData.append('paymentScreenshot', base64Data);
-            formData.append('fileName', file.name);
-            formData.append('fileType', file.type);
-            
-            console.log('Converted payment screenshot to base64 format');
-          } catch (error) {
-            console.error('Error converting file to base64:', error);
-          }
-        }
-        
         try {
-          response = await fetch(updateEndpoint, {
-            method: 'POST', // Use POST for updates as specifically requested
-            body: formData,
-            credentials: 'same-origin'
+          // Try using XMLHttpRequest which may handle file uploads better
+          response = await new Promise<Response>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            
+            xhr.onreadystatechange = function() {
+              if (xhr.readyState === 4) {
+                console.log('XHR Response:', {
+                  status: xhr.status,
+                  statusText: xhr.statusText,
+                  responseText: xhr.responseText,
+                  responseType: xhr.responseType,
+                  responseURL: xhr.responseURL
+                });
+                
+                // Create a Response object to match the fetch API
+                const responseHeaders = new Headers();
+                const headerString = xhr.getAllResponseHeaders();
+                const headerPairs = headerString.trim().split(/[\r\n]+/);
+                
+                headerPairs.forEach(line => {
+                  const parts = line.split(': ');
+                  const header = parts.shift();
+                  const value = parts.join(': ');
+                  if (header) responseHeaders.append(header, value);
+                });
+                
+                const responseObj = new Response(xhr.responseText, {
+                  status: xhr.status,
+                  statusText: xhr.statusText,
+                  headers: responseHeaders
+                });
+                
+                if (xhr.status >= 200 && xhr.status < 300) {
+                  resolve(responseObj);
+                } else {
+                  reject(responseObj);
+                }
+              }
+            };
+            
+            xhr.open('POST', updateEndpoint);
+            xhr.withCredentials = true;
+            
+            // Do not set Content-Type, let the browser set it with the boundary
+            xhr.send(formData);
           });
           
         } catch (fetchError: unknown) {

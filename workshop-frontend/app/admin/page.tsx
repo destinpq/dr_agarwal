@@ -78,9 +78,8 @@ export default function AdminPage() {
   const fetchRegistrations = async () => {
     setLoading(true);
     try {
-      // Connect to the real backend API
-      const backendUrl = 'https://plankton-app-jrxs6.ondigitalocean.app/api';
-      const response = await fetch(`${backendUrl}/registrations`);
+      // Use next.js API routes as a proxy to the backend
+      const response = await fetch('/api/registrations');
       
       if (!response.ok) {
         throw new Error(`Failed to fetch registrations: ${response.statusText}`);
@@ -144,12 +143,10 @@ export default function AdminPage() {
           : []
       };
       
-      const backendUrl = 'https://plankton-app-jrxs6.ondigitalocean.app/api';
-      
       if (modalMode === 'edit' && currentRecord) {
-        // Update existing record
-        const response = await fetch(`${backendUrl}/registrations/${currentRecord.id}`, {
-          method: 'PATCH', // Changed from PUT to PATCH to match backend API
+        // Update existing record using our API route
+        const response = await fetch(`/api/registrations/${currentRecord.id}`, {
+          method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -167,7 +164,7 @@ export default function AdminPage() {
         });
       } else {
         // Create new record
-        const response = await fetch(`${backendUrl}/registrations`, {
+        const response = await fetch(`/api/registrations`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -202,8 +199,7 @@ export default function AdminPage() {
   // Delete record handler
   const handleDelete = async (id: string) => {
     try {
-      const backendUrl = 'https://plankton-app-jrxs6.ondigitalocean.app/api';
-      const response = await fetch(`${backendUrl}/registrations/${id}`, {
+      const response = await fetch(`/api/registrations/${id}`, {
         method: 'DELETE',
       });
       

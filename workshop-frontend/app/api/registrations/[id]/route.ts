@@ -51,18 +51,18 @@ export async function GET(
   try {
     const { id } = params;
     
-    // In a real implementation, you would fetch from your database
-    // For now, we'll return mock data
-    const registration = findRegistrationById(id);
+    // Connect to the real backend API
+    const response = await fetch(`${backendUrl}/registrations/${id}`);
     
-    if (!registration) {
+    if (!response.ok) {
       return NextResponse.json(
-        { error: 'Registration not found' },
-        { status: 404 }
+        { error: 'Registration not found or failed to fetch' },
+        { status: response.status }
       );
     }
     
-    return NextResponse.json(registration);
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching registration:', error);
     return NextResponse.json(
@@ -117,18 +117,18 @@ export async function DELETE(
   try {
     const { id } = params;
     
-    // In a real implementation, you would delete from your database
-    // For now, we'll just mock a successful deletion
-    const registration = findRegistrationById(id);
+    // Connect to the real backend API
+    const response = await fetch(`${backendUrl}/registrations/${id}`, {
+      method: 'DELETE',
+    });
     
-    if (!registration) {
+    if (!response.ok) {
       return NextResponse.json(
-        { error: 'Registration not found' },
-        { status: 404 }
+        { error: `Failed to delete registration: ${response.statusText}` },
+        { status: response.status }
       );
     }
     
-    // Return success message
     return NextResponse.json({ message: 'Registration deleted successfully' });
   } catch (error) {
     console.error('Error deleting registration:', error);
@@ -139,92 +139,37 @@ export async function DELETE(
   }
 }
 
-// API endpoint for updating a registration by ID
+// Update a registration via PATCH
 export async function PATCH(
-  request: Request,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   try {
-    // Check if backend URL is configured
-    if (!backendUrl) {
+    const { id } = params;
+    const body = await request.json();
+    
+    // Connect to the real backend API
+    const response = await fetch(`${backendUrl}/registrations/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    
+    if (!response.ok) {
       return NextResponse.json(
-        { error: 'Backend URL not configured. Please set BACKEND_URL in environment variables.' },
-        { status: 500 }
+        { error: `Failed to update registration: ${response.statusText}` },
+        { status: response.status }
       );
     }
-
-    const formData = await request.formData();
-    const id = context.params.id;
-
-    if (!id) {
-      return NextResponse.json(
-        { error: 'Registration ID is required' },
-        { status: 400 }
-      );
-    }
-
-    if (id === 'unknown') {
-      return NextResponse.json(
-        { error: 'Invalid registration ID. Please start registration again.' },
-        { status: 400 }
-      );
-    }
-
-    console.log(`Processing update for registration ID: ${id}`);
-    const updateEndpoint = `https://plankton-app-jrxs6.ondigitalocean.app/api/registrations/${id}`;
-    console.log(`Updating registration at: ${updateEndpoint}`);
-
-    // Log the formData contents for debugging
-    console.log('Updating with formData contents:');
-    for (const [key, value] of formData.entries()) {
-      // Check if it's a file
-      if (value instanceof File) {
-        console.log(`${key}: File (${value.name}, ${value.type}, ${value.size} bytes)`);
-      } else {
-        console.log(`${key}: ${value}`);
-      }
-    }
-
-    try {
-      const response = await fetch(updateEndpoint, {
-        method: 'PATCH',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          return NextResponse.json(
-            { error: errorData.message || 'Failed to update registration' },
-            { status: response.status }
-          );
-        } else {
-          return NextResponse.json(
-            { error: `Update failed: ${response.statusText}` },
-            { status: response.status }
-          );
-        }
-      }
-
-      const data = await response.json();
-      console.log('Update successful, received data:', data);
-      return NextResponse.json({
-        ...data,
-        message: 'Your payment has been confirmed. A confirmation email has been sent to your registered email address.'
-      });
-
-    } catch (fetchError) {
-      console.error('Connection error:', fetchError);
-      return NextResponse.json(
-        { error: 'Failed to connect to the backend server' },
-        { status: 503 }
-      );
-    }
+    
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Update registration error:', error);
+    console.error('Error updating registration:', error);
     return NextResponse.json(
-      { error: 'An error occurred while updating registration' },
+      { error: 'Failed to update registration' },
       { status: 500 }
     );
   }

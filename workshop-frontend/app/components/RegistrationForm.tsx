@@ -268,9 +268,10 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
               }
             };
             
-            // Force the full URL to ensure no environment variable confusion
-            console.log('Opening XHR with endpoint:', window.location.origin + `/api/update-registration/${registrationId}`);
-            xhr.open('POST', `/api/update-registration/${registrationId}`);
+            // Use the correct API endpoint URL
+            const apiEndpoint = `/api/update-registration/${registrationId}`;
+            console.log('Opening XHR with endpoint:', apiEndpoint);
+            xhr.open('POST', apiEndpoint);
             xhr.withCredentials = true;
             
             // Do not set Content-Type, let the browser set it with the boundary

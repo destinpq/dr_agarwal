@@ -277,9 +277,6 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             // Ensure the file is included properly
             const formDataWithFile = new FormData();
             
-            // Add the registration ID to the form data
-            formDataWithFile.append('id', registrationId);
-            
             // Add paymentStatus = completed
             formDataWithFile.append('paymentStatus', 'completed');
             

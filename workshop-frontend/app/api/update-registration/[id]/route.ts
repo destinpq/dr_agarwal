@@ -47,21 +47,24 @@ export async function POST(
       }
     }
 
-    // Add the ID to the form data if not already present
-    if (!formData.has('id')) {
-      formData.append('id', id);
+    // Create a clean form data without the ID property
+    const cleanFormData = new FormData();
+    for (const [key, value] of formData.entries()) {
+      if (key !== 'id') {
+        cleanFormData.append(key, value);
+      }
     }
 
     // Set payment status to completed
-    if (!formData.has('paymentStatus')) {
-      formData.append('paymentStatus', 'completed');
+    if (!cleanFormData.has('paymentStatus')) {
+      cleanFormData.append('paymentStatus', 'completed');
     }
 
     try {
       // Use PATCH for payment updates
       const response = await fetch(updateEndpoint, {
         method: 'PATCH',
-        body: formData,
+        body: cleanFormData,
       });
 
       if (!response.ok) {

@@ -268,14 +268,34 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
               }
             };
             
-            // Use the correct API endpoint URL
+            // Make sure to use the API route we built for handling form data with files
             const apiEndpoint = `/api/update-registration/${registrationId}`;
             console.log('Opening XHR with endpoint:', apiEndpoint);
             xhr.open('POST', apiEndpoint);
             xhr.withCredentials = true;
             
-            // Do not set Content-Type, let the browser set it with the boundary
-            xhr.send(formData);
+            // Ensure the file is included properly
+            const formDataWithFile = new FormData();
+            
+            // Add the registration ID to the form data
+            formDataWithFile.append('id', registrationId);
+            
+            // Add paymentStatus = completed
+            formDataWithFile.append('paymentStatus', 'completed');
+            
+            // Make sure to properly add the payment screenshot
+            if (data.paymentScreenshot && data.paymentScreenshot.length > 0) {
+              const file = data.paymentScreenshot[0] as unknown as File;
+              console.log('Adding file to form data:', {
+                name: file.name,
+                type: file.type,
+                size: file.size
+              });
+              formDataWithFile.append('paymentScreenshot', file, file.name);
+            }
+            
+            // Send the FormData object
+            xhr.send(formDataWithFile);
           });
           
         } catch (fetchError: unknown) {

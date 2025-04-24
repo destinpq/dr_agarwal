@@ -38,6 +38,10 @@ const nextConfig = {
       {
         source: '/api/registrations',
         destination: `${BACKEND_URL}/api/registrations`,
+      },
+      {
+        source: '/api/update-registration/:id',
+        destination: `${BACKEND_URL}/api/registrations/:id`,
       }
     ];
   },

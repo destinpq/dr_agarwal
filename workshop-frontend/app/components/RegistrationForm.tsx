@@ -227,11 +227,6 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         formData.append('id', registrationId);
         console.log('Submitting registration - Step 2: Payment update for ID:', registrationId);
         
-        // Use the dedicated update-registration endpoint that handles POST properly
-        const updateEndpoint = '/api/update-registration';
-        
-        console.log('Using update endpoint:', updateEndpoint);
-        
         try {
           // Try using XMLHttpRequest which may handle file uploads better
           response = await new Promise<Response>((resolve, reject) => {
@@ -274,8 +269,8 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             };
             
             // Force the full URL to ensure no environment variable confusion
-            console.log('Opening XHR with endpoint:', window.location.origin + updateEndpoint);
-            xhr.open('POST', updateEndpoint);
+            console.log('Opening XHR with endpoint:', window.location.origin + `/api/update-registration/${registrationId}`);
+            xhr.open('POST', `/api/update-registration/${registrationId}`);
             xhr.withCredentials = true;
             
             // Do not set Content-Type, let the browser set it with the boundary

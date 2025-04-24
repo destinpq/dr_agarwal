@@ -1,10 +1,143 @@
 // This file intentionally left empty for now to resolve build errors
 // Originally contained a PATCH handler which caused persistent type issues. 
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Hardcoded backend URL
 const backendUrl = 'https://plankton-app-jrxs6.ondigitalocean.app/api';
+
+// Helper function to find registration by ID (for mock data)
+const findRegistrationById = (id: string) => {
+  // Sample registrations (same as in main route.ts)
+  const registrations = [
+    {
+      id: '1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      phone: '9876543210',
+      age: 25,
+      interestArea: 'clinical',
+      preferredTiming: 'morning',
+      preferredDates: ['2025-05-10', '2025-05-15'],
+      expectations: 'I want to learn about psychology fundamentals',
+      referralSource: 'social',
+      paymentStatus: 'completed',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: '2',
+      name: 'Jane Smith',
+      email: 'jane@example.com',
+      phone: '8765432109',
+      age: 30,
+      interestArea: 'cognitive',
+      preferredTiming: 'evening',
+      preferredDates: ['2025-05-20', '2025-05-25'],
+      expectations: 'Looking to understand cognitive behavioral therapy',
+      referralSource: 'friend',
+      paymentStatus: 'pending',
+      createdAt: new Date().toISOString()
+    }
+  ];
+  
+  return registrations.find(reg => reg.id === id);
+};
+
+// Get a single registration by ID
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+    
+    // In a real implementation, you would fetch from your database
+    // For now, we'll return mock data
+    const registration = findRegistrationById(id);
+    
+    if (!registration) {
+      return NextResponse.json(
+        { error: 'Registration not found' },
+        { status: 404 }
+      );
+    }
+    
+    return NextResponse.json(registration);
+  } catch (error) {
+    console.error('Error fetching registration:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch registration' },
+      { status: 500 }
+    );
+  }
+}
+
+// Update a registration
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+    const body = await request.json();
+    
+    // In a real implementation, you would update your database
+    // For now, we'll just mock a successful update
+    const registration = findRegistrationById(id);
+    
+    if (!registration) {
+      return NextResponse.json(
+        { error: 'Registration not found' },
+        { status: 404 }
+      );
+    }
+    
+    // Mock the updated registration
+    const updatedRegistration = {
+      ...registration,
+      ...body,
+      id // Make sure ID doesn't change
+    };
+    
+    return NextResponse.json(updatedRegistration);
+  } catch (error) {
+    console.error('Error updating registration:', error);
+    return NextResponse.json(
+      { error: 'Failed to update registration' },
+      { status: 500 }
+    );
+  }
+}
+
+// Delete a registration
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+    
+    // In a real implementation, you would delete from your database
+    // For now, we'll just mock a successful deletion
+    const registration = findRegistrationById(id);
+    
+    if (!registration) {
+      return NextResponse.json(
+        { error: 'Registration not found' },
+        { status: 404 }
+      );
+    }
+    
+    // Return success message
+    return NextResponse.json({ message: 'Registration deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting registration:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete registration' },
+      { status: 500 }
+    );
+  }
+}
 
 // API endpoint for updating a registration by ID
 export async function PATCH(

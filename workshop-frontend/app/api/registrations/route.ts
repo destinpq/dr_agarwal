@@ -140,4 +140,50 @@ export async function PATCH(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Get all registrations
+export async function GET() {
+  try {
+    // In a real implementation, you would fetch from your database
+    // For now, we'll return mock data
+    const registrations = [
+      {
+        id: '1',
+        name: 'John Doe',
+        email: 'john@example.com',
+        phone: '9876543210',
+        age: 25,
+        interestArea: 'clinical',
+        preferredTiming: 'morning',
+        preferredDates: ['2025-05-10', '2025-05-15'],
+        expectations: 'I want to learn about psychology fundamentals',
+        referralSource: 'social',
+        paymentStatus: 'completed',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: '2',
+        name: 'Jane Smith',
+        email: 'jane@example.com',
+        phone: '8765432109',
+        age: 30,
+        interestArea: 'cognitive',
+        preferredTiming: 'evening',
+        preferredDates: ['2025-05-20', '2025-05-25'],
+        expectations: 'Looking to understand cognitive behavioral therapy',
+        referralSource: 'friend',
+        paymentStatus: 'pending',
+        createdAt: new Date().toISOString()
+      }
+    ];
+
+    return NextResponse.json(registrations);
+  } catch (error) {
+    console.error('Error fetching registrations:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch registrations' },
+      { status: 500 }
+    );
+  }
 } 
